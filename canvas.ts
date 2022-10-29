@@ -1,44 +1,56 @@
-import { App, MarkdownView, Modal, Setting } from "obsidian";
-import { type } from "os";
+import { Tool } from "./tool";
 
 export class Canvas{
 
-  static editorContainer: HTMLElement
-  static overlay: HTMLDivElement
-  static canvas: HTMLElement
+    htmlCanvas: HTMLCanvasElement
+    context: CanvasRenderingContext2D
+    started: boolean
 
-  constructor(currentView: MarkdownView) {
-    Canvas.editorContainer = currentView.containerEl;
-    Canvas.editorContainer.appendChild(this.createOverlay());
-    console.log(Canvas.editorContainer.children);
-  }
+    constructor(overlay: HTMLDivElement) {
+        this.htmlCanvas = overlay.createEl("canvas", {cls: "drawing_canvas"})
+        this.htmlCanvas.width = this.htmlCanvas.offsetWidth;
+        this.htmlCanvas.height = this.htmlCanvas.offsetHeight;
 
-  private createOverlay(){
-    console.log('Pergament: Create Overlay');
+        console.log(this.htmlCanvas.width + ' | '+ this.htmlCanvas.offsetWidth)
+        this.context = this.htmlCanvas.getContext('2d');
 
-    var container = Canvas.editorContainer;
-    var overlay = Canvas.overlay;
-    overlay = container.createEl("div", {cls: "overlay"});
+        // Attach the mousedown, mousemove and mouseup event listeners
+        this.htmlCanvas.addEventListener('mousedown', function(ev: PointerEvent) {this.down(ev);}.bind(this), false);
+        this.htmlCanvas.addEventListener('mousemove', function(ev: PointerEvent) {this.move(ev);}.bind(this), false);
+        this.htmlCanvas.addEventListener('mouseup',	 function(ev: PointerEvent) {this.up(ev);}.bind(this), false);
+    }
 
-    var menuBar = overlay.createEl("div", {cls: "menu_bar"})
+    setTool(tool: Tool) {
+        //this.tool = tool
+    }
 
-    var canvas = overlay.createEl("canvas", {cls: "drawing_canvas"})
+    
+    // The general-purpose event handler. This function just determines
+    // the mouse position relative to the <canvas> element
+    down(ev: PointerEvent){
+        console.log("Pergament: tool down")
+        console.log(ev.offsetX)
+        console.log(ev.offsetY)
+        this.context.beginPath();
+        this.context.moveTo(ev.offsetX, ev.offsetY)
+        this.started = true;
+    }
+    
+    move(ev: PointerEvent){
+        console.log("Pergament: tool move");
+        if (this.started) {
+            this.context.lineTo(ev.offsetX, ev.offsetY);
+            this.context.stroke();
+        }
+    }
+    
+    up(ev: PointerEvent){
+        console.log("Pergament: tool up")
+        this.move(ev)
+        this.started = false;
+    }
 
-    var closeButton = menuBar.createEl("button", {text: "close", cls: "close_canvas"});
-    closeButton.addEventListener("click", this.closeOverlay);
-
-    Canvas.overlay = overlay
-    Canvas.canvas = canvas
-    return overlay;
-  }
-
-  private createPencils(menuBar: HTMLDivElement) {
-
-  }
-
-  private closeOverlay(){
-    console.log("Pergament: Close Overlay");
-    console.log(typeof Canvas.overlay)
-    Canvas.editorContainer.removeChild(Canvas.overlay);
-  }
+    getSVG() {
+        
+    }
 }

@@ -1,5 +1,7 @@
 import { Canvas } from 'canvas';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, View, WorkspaceLeaf } from 'obsidian';
+import * as moment from 'moment';
+import { App, Editor, MarkdownView, Modal, moment_2, Notice, Plugin, PluginSettingTab, Setting, View, WorkspaceLeaf } from 'obsidian';
+import { Overlay } from 'overlay';
 import { ExampleView, VIEW_TYPE_EXAMPLE } from 'view';
 
 // Remember to rename these classes and interfaces!
@@ -31,7 +33,8 @@ export default class Pergament extends Plugin {
 						var currentView = this.app.workspace.getActiveViewOfType(MarkdownView);
 						if (currentView != null) {
 							console.log(currentView.containerEl)
-							new Canvas(currentView)
+							new Overlay(currentView)
+							//this.addDate()
 						}
 					}
 
@@ -40,6 +43,12 @@ export default class Pergament extends Plugin {
 				}
 			}
 		});
+	}
+
+	private addDate() {
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView)
+		const cursor = view?.editor.getCursor();
+		view?.editor.replaceRange('Pergament', cursor)
 	}
 
 	onunload() {
