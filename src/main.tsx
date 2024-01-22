@@ -1,5 +1,8 @@
 import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView } from '@codemirror/view';
+import { createRoot } from "react-dom/client";
+import { StrictMode } from 'react';
+import { PergamentCanvas } from './pergamentCanvas';
 
 // Remember to rename these classes and interfaces!
 
@@ -31,10 +34,12 @@ export default class MyPlugin extends Plugin {
 
 			console.log("other mode, trying to change content");
 
-			const mark = el.createEl('div');
-			mark.setAttr("id", id);
-			mark.innerHTML = "this is a pergament codeblock";
-			el.appendChild(mark);
+			const root = createRoot(el);
+			root.render(
+				<StrictMode>
+					<PergamentCanvas />
+				</StrictMode>
+			)
 		});
 
 		//accessing the editor content only works in a function sepereate from rendering the markdown codeblock
@@ -62,7 +67,7 @@ export default class MyPlugin extends Plugin {
 				const now = new Date();
 				const text = line.text;
 
-				let transaction = view.state.update({changes: {from: line.from, to: line.to, insert: now.toLocaleString()}})
+				let transaction = view.state.update({ changes: { from: line.from, to: line.to, insert: now.toLocaleString() } })
 				view.dispatch(transaction);
 				console.log("updated codeblock");
 			},
@@ -92,7 +97,7 @@ class SampleSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
