@@ -2,9 +2,7 @@ import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from 'react';
-import { PergamentCanvas } from './pergamentCanvas';
-
-// Remember to rename these classes and interfaces!
+import { PergamentCanvas } from './PergamentCanvas';
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -37,7 +35,7 @@ export default class MyPlugin extends Plugin {
 			const root = createRoot(el);
 			root.render(
 				<StrictMode>
-					<PergamentCanvas />
+					<PergamentCanvas/>
 				</StrictMode>
 			)
 		});
