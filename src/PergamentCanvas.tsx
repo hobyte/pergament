@@ -9,7 +9,7 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
     const height = 400;
 
     const isDrawing = useRef(false);
-    const [lines, setLines] = useState([]);
+    const [lines, setLines] = useState(source.length>0 ? JSON.parse(source) : []);
     let stageRef = useRef(null);
 
     const handelMouseDown = (event: KonvaEventObject<MouseEvent>) => {
@@ -35,9 +35,7 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
 
     const handleMouseUp = (event: KonvaEventObject<MouseEvent>) => {
         if (!editable) return;
-        console.log(typeof stageRef.current);
         
-
         isDrawing.current = false;
         storageAdapter.save(JSON.stringify(lines), id);
     }

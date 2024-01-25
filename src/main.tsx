@@ -22,7 +22,6 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 		const id = "newid";
 
 		this.registerMarkdownCodeBlockProcessor("pergament", (source, el, ctx) => {
-			console.log("render code block");
 			let editable = true;
 			const mdView: MarkdownView | null = this.app.workspace.getActiveViewOfType(MarkdownView)
 
@@ -56,9 +55,6 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 	}
 
 	save(content: string, id: string): void {
-		console.log('save to file');
-		
-
 		const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (mdView?.getMode() === 'preview') return;
 
@@ -75,22 +71,17 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 			console.log(`element not accesible to konva: ${error}`);
 		}
 		
-		console.log('change md');
-		
-		let line = view.state.doc.lineAt(pos);		
-		console.log(line.text);
+		let line = view.state.doc.lineAt(pos);
 		
 		//find content of codeblock:
 		if (line.text.contains('```pergament')) {
 			line = view.state.doc.lineAt(line.to + 1);
 			//check if codeblock is empty
 			if (view.state.doc.lineAt(line.to).text.contains('```')) {
-				console.log('codeblock empty');
 				let transaction = view.state.update({ changes: { from: line.from, to: line.from, insert: `${content}\n` } })
 				view.dispatch(transaction);
 				
 			} else {
-				console.log(`codeblock has content: ${line.text}`);
 				let transaction = view.state.update({ changes: { from: line.from, to: line.to, insert: content } })
 				view.dispatch(transaction);
 			}
