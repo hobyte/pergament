@@ -22,20 +22,17 @@ export default class MyPlugin extends Plugin {
 
 		this.registerMarkdownCodeBlockProcessor("pergament", (source, el, ctx) => {
 			console.log("render code block");
+			let editable = true;
 			const mdView: MarkdownView | null = this.app.workspace.getActiveViewOfType(MarkdownView)
 
 			if (mdView?.getMode() === 'preview') {
-				console.log("preview mode, just render text");
-				el.innerHTML = source;
-				return;
+				editable = false;
 			}
-
-			console.log("other mode, trying to change content");
 
 			const root = createRoot(el);
 			root.render(
 				<StrictMode>
-					<PergamentCanvas/>
+					<PergamentCanvas editable={editable}/>
 				</StrictMode>
 			)
 		});

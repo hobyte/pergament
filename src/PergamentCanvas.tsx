@@ -1,29 +1,39 @@
 import { Rect } from "konva/lib/shapes/Rect";
-import { useRef } from "react";
-import { Stage, Layer } from "react-konva";
+import { useRef, useState } from "react";
+import { Stage, Layer, Line } from "react-konva";
 
-export function PergamentCanvas() {
+export function PergamentCanvas({ editable, source }: { editable: boolean, source: string }) {
     const width = window.innerWidth;
     const height = 400;
+    const isDrawing = useRef(false);
+    const [lines, setLines] = useState([]);
     let stageRef = useRef(null);
 
-    const handleClick = (event) => {
-        const stage = stageRef.current
-        if (!stage) {
-            console.log('stage is null');
-            return
-        }
-        const layer = stage.getLayers()[0];
-        const pos = stage.getPointerPosition();
-        const rect = new Rect({
-            x: pos.x,
-            y: pos.y,
-            width: 100,
-            height: 100,
-            fill: 'red',
-            draggable: true
-        });
-        layer.add(rect);
+    const handelMouseDown = (event) => {
+        if (!editable) return;
+
+        isDrawing.current = true;
+        const pos = stageRef.current?.getPointerPosition();
+        setLines([...lines, { points: [pos.x, pos.y] }]);
+    }
+
+    const handelMouseMove = (event) => {
+        if (!editable) return;
+        if (!isDrawing.current) return;
+
+        const stage = stageRef.current;
+        const point = stage?.getPointerPosition();
+        let lastLine = lines[lines.length - 1];
+        
+        lastLine.points = lastLine.points.concat([point.x, point.y]);
+        lines.splice(lines.length - 1, 1, lastLine);
+        setLines(lines.concat());
+    }
+
+    const handleMouseUp = (event) => {
+        if (!editable) return;
+
+        isDrawing.current = false;
     }
 
     return (
@@ -31,10 +41,24 @@ export function PergamentCanvas() {
             className="pergament-stage"
             width={width}
             height={height}
-            onClick={handleClick}
             ref={stageRef}
+            onMouseDown={handelMouseDown}
+            onMouseMove={handelMouseMove}
+            onMouseUp={handleMouseUp}
         >
             <Layer>
+                {lines.map((line, i) => (
+                    <Line
+                        key={i}
+                        points={line.points}
+                        stroke="#df4b26"
+                        strokeWidth={5}
+                        tension={0.5}
+                        lineCap="round"
+                        lineJoin="round"
+                        globalCompositeOperation={'source-over'}
+                    />
+                ))}
             </Layer>
         </Stage>
     );
