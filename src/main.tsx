@@ -3,6 +3,7 @@ import { EditorView } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from 'react';
 import { PergamentCanvas } from './PergamentCanvas';
+import { StorageAdapter } from './StorageAdapter';
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -12,7 +13,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
+export default class MyPlugin extends Plugin implements StorageAdapter {
 	settings: MyPluginSettings;
 
 	async onload() {
@@ -32,40 +33,13 @@ export default class MyPlugin extends Plugin {
 			const root = createRoot(el);
 			root.render(
 				<StrictMode>
-					<PergamentCanvas editable={editable}/>
+					<PergamentCanvas
+						editable={editable}
+						source={source}
+						storageAdapter={this}
+					/>
 				</StrictMode>
 			)
-		});
-
-		//accessing the editor content only works in a function sepereate from rendering the markdown codeblock
-		this.addCommand({
-			id: "save",
-			name: "save content to md file",
-			callback: () => {
-				console.log("save mode");
-				const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-				if (mdView.getMode() === 'preview') return;
-
-				const view = mdView.editor.cm as EditorView;
-				const mark = document.getElementById(id);
-
-				const pos = view.posAtDOM(mark as Node);
-				var line = view.state.doc.lineAt(pos);
-				if (line.text.contains('```pergament')) {
-					line = view.state.doc.lineAt(line.to + 1);
-				}
-				//line contains the position of the codeblock content
-				console.log(pos, line);
-
-				//save new content to codeblock
-				const now = new Date();
-				const text = line.text;
-
-				let transaction = view.state.update({ changes: { from: line.from, to: line.to, insert: now.toLocaleString() } })
-				view.dispatch(transaction);
-				console.log("updated codeblock");
-			},
 		});
 	}
 
@@ -79,6 +53,49 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	save(content: string, id: string): void {
+		console.log('save to file');
+		
+
+		const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (mdView?.getMode() === 'preview') return;
+
+		// @ts-ignore
+		const view = mdView?.editor.cm as EditorView;
+		const element = document.getElementById(id);
+		if (!element) {
+			console.log('cannot find element in document');
+		}
+		let pos = 0;
+		try {
+			pos = view.posAtDOM(element as Node);
+		} catch (error) {
+			console.log(`element not accesible to konva: ${error}`);
+		}
+		
+		console.log('change md');
+		
+		let line = view.state.doc.lineAt(pos);		
+		console.log(line.text);
+		
+		//find content of codeblock:
+		if (line.text.contains('```pergament')) {
+			line = view.state.doc.lineAt(line.to + 1);
+			//check if codeblock is empty
+			if (view.state.doc.lineAt(line.to).text.contains('```')) {
+				console.log('codeblock empty');
+				let transaction = view.state.update({ changes: { from: line.from, to: line.from, insert: `${content}\n` } })
+				view.dispatch(transaction);
+				
+			} else {
+				console.log(`codeblock has content: ${line.text}`);
+				let transaction = view.state.update({ changes: { from: line.from, to: line.to, insert: content } })
+				view.dispatch(transaction);
+			}
+		}
+		
 	}
 }
 

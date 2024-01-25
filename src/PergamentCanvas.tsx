@@ -1,15 +1,18 @@
-import { Rect } from "konva/lib/shapes/Rect";
-import { useRef, useState } from "react";
+import { KonvaEventObject } from "konva/lib/Node";
+import { useId, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
+import { StorageAdapter } from "./StorageAdapter";
 
-export function PergamentCanvas({ editable, source }: { editable: boolean, source: string }) {
+export function PergamentCanvas({ editable, source, storageAdapter }: { editable: boolean, source: string, storageAdapter: StorageAdapter }) {
+    const id = useId();
     const width = window.innerWidth;
     const height = 400;
+
     const isDrawing = useRef(false);
     const [lines, setLines] = useState([]);
     let stageRef = useRef(null);
 
-    const handelMouseDown = (event) => {
+    const handelMouseDown = (event: KonvaEventObject<MouseEvent>) => {
         if (!editable) return;
 
         isDrawing.current = true;
@@ -17,7 +20,7 @@ export function PergamentCanvas({ editable, source }: { editable: boolean, sourc
         setLines([...lines, { points: [pos.x, pos.y] }]);
     }
 
-    const handelMouseMove = (event) => {
+    const handelMouseMove = (event: KonvaEventObject<MouseEvent>) => {
         if (!editable) return;
         if (!isDrawing.current) return;
 
@@ -30,15 +33,19 @@ export function PergamentCanvas({ editable, source }: { editable: boolean, sourc
         setLines(lines.concat());
     }
 
-    const handleMouseUp = (event) => {
+    const handleMouseUp = (event: KonvaEventObject<MouseEvent>) => {
         if (!editable) return;
+        console.log(typeof stageRef.current);
+        
 
         isDrawing.current = false;
+        storageAdapter.save(JSON.stringify(lines), id);
     }
 
     return (
         <Stage
             className="pergament-stage"
+            id={id}
             width={width}
             height={height}
             ref={stageRef}
