@@ -9,7 +9,7 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
     const height = 400;
 
     const isDrawing = useRef(false);
-    const [lines, setLines] = useState(source.length>0 ? JSON.parse(source) : []);
+    const [lines, setLines] = useState(source.length > 0 ? JSON.parse(source) : []);
     let stageRef = useRef(null);
 
     const handelMouseDown = (event: KonvaEventObject<MouseEvent>) => {
@@ -17,7 +17,7 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
 
         isDrawing.current = true;
         const pos = stageRef.current?.getPointerPosition();
-        setLines([...lines, { points: [pos.x, pos.y] }]);
+        setLines([...lines, { color: window.selectedColor, points: [pos.x, pos.y] }]);
     }
 
     const handelMouseMove = (event: KonvaEventObject<MouseEvent>) => {
@@ -27,7 +27,7 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
         const stage = stageRef.current;
         const point = stage?.getPointerPosition();
         let lastLine = lines[lines.length - 1];
-        
+
         lastLine.points = lastLine.points.concat([point.x, point.y]);
         lines.splice(lines.length - 1, 1, lastLine);
         setLines(lines.concat());
@@ -35,9 +35,22 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
 
     const handleMouseUp = (event: KonvaEventObject<MouseEvent>) => {
         if (!editable) return;
-        
+
         isDrawing.current = false;
         storageAdapter.save(JSON.stringify(lines), id);
+    }
+
+    const calculateColor = (source: string) => {
+        switch (source) {
+            case 'red':
+                return '#fd0802';
+            case 'green':
+                return '#07f80a';
+            case 'blue':
+                return '#0a99f5';
+            default:
+                return '#eaff00';
+        }
     }
 
     return (
@@ -56,7 +69,7 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
                     <Line
                         key={i}
                         points={line.points}
-                        stroke="#df4b26"
+                        stroke={calculateColor(line.color)}
                         strokeWidth={5}
                         tension={0.5}
                         lineCap="round"
