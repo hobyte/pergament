@@ -1,9 +1,10 @@
 import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { EditorView } from '@codemirror/view';
+import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
-import { StrictMode } from 'react';
+import { StrictMode, createContext } from 'react';
 import { PergamentCanvas } from './PergamentCanvas';
 import { StorageAdapter } from './StorageAdapter';
+import { Toolbar } from './Toolbar';
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -13,13 +14,32 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
 
+declare let selectedColor: 'red';
+
 export default class MyPlugin extends Plugin implements StorageAdapter {
 	settings: MyPluginSettings;
 
 	async onload() {
-		await this.loadSettings();
-		console.log("loaded settings");
-		const id = "newid";
+		await this.loadSettings()
+
+		const panel: Panel = {
+			dom: document.createElement('div'),
+			mount: () => {
+				const panelRoot = createRoot(panel.dom);
+				panelRoot.render(
+					<StrictMode>
+						<Toolbar />
+					</StrictMode>
+				)
+			},
+			top: true
+		}
+
+		const loadPanel = (view: EditorView) => {
+			return panel
+		}
+
+		this.registerEditorExtension(showPanel.of(loadPanel));
 
 		this.registerMarkdownCodeBlockProcessor("pergament", (source, el, ctx) => {
 			let editable = true;
@@ -29,8 +49,8 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 				editable = false;
 			}
 
-			const root = createRoot(el);
-			root.render(
+			const canvasRoot = createRoot(el);
+			canvasRoot.render(
 				<StrictMode>
 					<PergamentCanvas
 						editable={editable}
@@ -70,9 +90,9 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 		} catch (error) {
 			console.log(`element not accesible to konva: ${error}`);
 		}
-		
+
 		let line = view.state.doc.lineAt(pos);
-		
+
 		//find content of codeblock:
 		if (line.text.contains('```pergament')) {
 			line = view.state.doc.lineAt(line.to + 1);
@@ -80,13 +100,13 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 			if (view.state.doc.lineAt(line.to).text.contains('```')) {
 				let transaction = view.state.update({ changes: { from: line.from, to: line.from, insert: `${content}\n` } })
 				view.dispatch(transaction);
-				
+
 			} else {
 				let transaction = view.state.update({ changes: { from: line.from, to: line.to, insert: content } })
 				view.dispatch(transaction);
 			}
 		}
-		
+
 	}
 }
 
