@@ -1,23 +1,26 @@
 import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
-import { StrictMode, createContext } from 'react';
+import { StrictMode } from 'react';
 import { PergamentCanvas } from './PergamentCanvas';
 import { StorageAdapter } from './StorageAdapter';
 import { Toolbar } from './Toolbar';
+import { Pen } from './Pen';
 
 interface MyPluginSettings {
-	mySetting: string;
+	pens: Pen[]
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	pens: [
+		{id: 0, name: 'title', color: '#3739c8', width: 10, tension: 0.5},
+		{id: 1, name: 'text', color: '#f61009', width: 3, tension: 0.5}
+	]
 }
-
-declare let selectedColor: 'red';
 
 export default class MyPlugin extends Plugin implements StorageAdapter {
 	settings: MyPluginSettings;
+	selectedPen: number = 0;
 
 	async onload() {
 		await this.loadSettings()
@@ -28,7 +31,10 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 				const panelRoot = createRoot(panel.dom);
 				panelRoot.render(
 					<StrictMode>
-						<Toolbar />
+						<Toolbar 
+							pens={this.settings.pens}
+							setSelectedPen={(id: number) => this.selectedPen = id}
+						/>
 					</StrictMode>
 				)
 			},
@@ -56,6 +62,8 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 						editable={editable}
 						source={source}
 						storageAdapter={this}
+						pens={this.settings.pens}
+						getSelectedPen={() => {return this.selectedPen}}
 					/>
 				</StrictMode>
 			)
@@ -127,12 +135,5 @@ class SampleSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('Setting #1')
 			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
