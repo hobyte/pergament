@@ -14,7 +14,8 @@ interface MyPluginSettings {
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	pens: [
 		{id: 0, name: 'title', color: '#3739c8', width: 10, tension: 0.5},
-		{id: 1, name: 'text', color: '#f61009', width: 3, tension: 0.5}
+		{id: 1, name: 'text', color: '#f61009', width: 3, tension: 0.5},
+		{id: 2, name: 'code', color: '#1be43e', width: 3, tension: 1}
 	]
 }
 
