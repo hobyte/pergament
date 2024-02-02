@@ -7,11 +7,11 @@ import { StorageAdapter } from './StorageAdapter';
 import { Toolbar } from './Toolbar';
 import { Pen } from './Pen';
 
-interface MyPluginSettings {
+interface PergamentSettings {
 	pens: Pen[]
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: PergamentSettings = {
 	pens: [
 		{id: 0, name: 'title', color: '#3739c8', width: 10, tension: 0.5},
 		{id: 1, name: 'text', color: '#f61009', width: 3, tension: 0.5},
@@ -19,8 +19,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	]
 }
 
-export default class MyPlugin extends Plugin implements StorageAdapter {
-	settings: MyPluginSettings;
+export default class Pergament extends Plugin implements StorageAdapter {
+	settings: PergamentSettings;
 	selectedPen: number = 0;
 
 	async onload() {
@@ -120,10 +120,10 @@ export default class MyPlugin extends Plugin implements StorageAdapter {
 }
 
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+class SettingsTab extends PluginSettingTab {
+	plugin: Pergament;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: Pergament) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
