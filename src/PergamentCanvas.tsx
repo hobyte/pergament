@@ -1,9 +1,11 @@
-import { KonvaEventObject } from "konva/lib/Node";
 import { useId, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "./StorageAdapter";
+import { Pen } from "./Pen";
 
-export function PergamentCanvas({ editable, source, storageAdapter }: { editable: boolean, source: string, storageAdapter: StorageAdapter }) {
+export function PergamentCanvas(
+        { editable, source, storageAdapter, pens, getSelectedPen }: 
+        { editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
     const id = useId();
     const width = window.innerWidth;
     const height = 400;
@@ -12,15 +14,15 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
     const [lines, setLines] = useState(source.length > 0 ? JSON.parse(source) : []);
     let stageRef = useRef(null);
 
-    const handelMouseDown = (event: KonvaEventObject<MouseEvent>) => {
+    const handelMouseDown = () => {
         if (!editable) return;
 
         isDrawing.current = true;
         const pos = stageRef.current?.getPointerPosition();
-        setLines([...lines, { color: window.selectedColor, points: [pos.x, pos.y] }]);
+        setLines([...lines, { penId: getPenFromId(getSelectedPen())?.id, points: [pos.x, pos.y] }]);
     }
 
-    const handelMouseMove = (event: KonvaEventObject<MouseEvent>) => {
+    const handelMouseMove = () => {
         if (!editable) return;
         if (!isDrawing.current) return;
 
@@ -33,24 +35,15 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
         setLines(lines.concat());
     }
 
-    const handleMouseUp = (event: KonvaEventObject<MouseEvent>) => {
+    const handleMouseUp = () => {
         if (!editable) return;
 
         isDrawing.current = false;
         storageAdapter.save(JSON.stringify(lines), id);
     }
 
-    const calculateColor = (source: string) => {
-        switch (source) {
-            case 'red':
-                return '#fd0802';
-            case 'green':
-                return '#07f80a';
-            case 'blue':
-                return '#0a99f5';
-            default:
-                return '#eaff00';
-        }
+    const getPenFromId = (id: number) => {
+        return pens.find(p => p.id === id);
     }
 
     return (
@@ -65,13 +58,13 @@ export function PergamentCanvas({ editable, source, storageAdapter }: { editable
             onMouseUp={handleMouseUp}
         >
             <Layer>
-                {lines.map((line, i) => (
+                {lines.map((line: {penId: number, points: number[]}, index: number) => (
                     <Line
-                        key={i}
+                        key={index}
                         points={line.points}
-                        stroke={calculateColor(line.color)}
-                        strokeWidth={5}
-                        tension={0.5}
+                        stroke={getPenFromId(line.penId)?.color}
+                        strokeWidth={getPenFromId(line.penId)?.width}
+                        tension={getPenFromId(line.penId)?.tension}
                         lineCap="round"
                         lineJoin="round"
                         globalCompositeOperation={'source-over'}

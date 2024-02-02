@@ -1,9 +1,15 @@
-export function Toolbar() {
+import { Pen } from "./Pen";
+
+export function Toolbar({ pens, setSelectedPen }: { pens: Pen[]; setSelectedPen: (penId: number) => void }) {
     return (
       <div>
-        <button onClick={() => {window.selectedColor = 'red'}}>Red</button>
-        <button onClick={() => {window.selectedColor = 'green'}}>Green</button>
-        <button onClick={() => {window.selectedColor = 'blue'}}>Blue</button>
+        {
+          pens.map(pen => (
+            <button key={pen.id} onClick={() => setSelectedPen(pen.id)}>
+              {pen.name}
+            </button>
+          ))
+        }
       </div>
     )
   }
