@@ -1,4 +1,4 @@
-import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from 'react';
@@ -60,6 +60,7 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			canvasRoot.render(
 				<StrictMode>
 					<PergamentCanvas
+						parent={el}
 						editable={editable}
 						source={source}
 						storageAdapter={this}

@@ -4,15 +4,15 @@ import { StorageAdapter } from "./StorageAdapter";
 import { Pen } from "./Pen";
 
 export function PergamentCanvas(
-        { editable, source, storageAdapter, pens, getSelectedPen }: 
-        { editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
+        { parent, editable, source, storageAdapter, pens, getSelectedPen }: 
+        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
+    const stageRef = useRef(null);
     const id = useId();
-    const width = window.innerWidth;
+    const width = parent.innerWidth;
     const height = 400;
 
     const isDrawing = useRef(false);
     const [lines, setLines] = useState(source.length > 0 ? JSON.parse(source) : []);
-    let stageRef = useRef(null);
 
     const handelMouseDown = () => {
         if (!editable) return;
