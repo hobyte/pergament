@@ -4,7 +4,7 @@ import { StorageAdapter } from "./StorageAdapter";
 import { Pen } from "./Pen";
 
 export function PergamentCanvas(
-        { parent, editable, source, storageAdapter, pens, getSelectedPen }: 
+    { parent, editable, source, storageAdapter, pens, getSelectedPen }:
         { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
     const stageRef = useRef(null);
     const id = useId();
@@ -16,14 +16,24 @@ export function PergamentCanvas(
 
     useLayoutEffect(() => {
         function updateWidth() {
-            setWidth(parent.innerWidth);
-            console.log('set new width');
-            
-          }
-          window.addEventListener('resize', updateWidth);
-          updateWidth();
-          return () => window.removeEventListener('resize', updateWidth);
-    },[]);
+            setWidth(calculateWidth());
+        }
+        window.addEventListener('resize', updateWidth);
+        updateWidth();
+        return () => window.removeEventListener('resize', updateWidth);
+    }, []);
+
+    const calculateWidth = () => {
+        const editorWidth = parent.innerWidth;
+        const contentWidth = Math.max(
+            ...lines
+                .map((line: { penId: number, points: number[] }, index: number) => { return line.points })
+                .flat()
+                //get only horizontal coordinates
+                .filter((point: number, index: number) => index % 2 === 0)
+        );
+        return editorWidth > contentWidth ? editorWidth : contentWidth;
+    };
 
     const handelMouseDown = () => {
         if (!editable) return;
@@ -71,7 +81,7 @@ export function PergamentCanvas(
             onMouseUp={handleMouseUp}
         >
             <Layer>
-                {lines.map((line: {penId: number, points: number[]}, index: number) => (
+                {lines.map((line: { penId: number, points: number[] }, index: number) => (
                     <Line
                         key={index}
                         points={line.points}
