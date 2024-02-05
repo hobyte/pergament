@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "./StorageAdapter";
 import { Pen } from "./Pen";
@@ -8,16 +8,28 @@ export function PergamentCanvas(
         { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
     const stageRef = useRef(null);
     const id = useId();
-    const width = parent.innerWidth;
+    const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
     const isDrawing = useRef(false);
     const [lines, setLines] = useState(source.length > 0 ? JSON.parse(source) : []);
 
+    useLayoutEffect(() => {
+        function updateWidth() {
+            setWidth(parent.innerWidth);
+            console.log('set new width');
+            
+          }
+          window.addEventListener('resize', updateWidth);
+          updateWidth();
+          return () => window.removeEventListener('resize', updateWidth);
+    },[]);
+
     const handelMouseDown = () => {
         if (!editable) return;
 
         isDrawing.current = true;
+        // @ts-ignore
         const pos = stageRef.current?.getPointerPosition();
         setLines([...lines, { penId: getPenFromId(getSelectedPen())?.id, points: [pos.x, pos.y] }]);
     }
@@ -27,6 +39,7 @@ export function PergamentCanvas(
         if (!isDrawing.current) return;
 
         const stage = stageRef.current;
+        // @ts-ignore
         const point = stage?.getPointerPosition();
         let lastLine = lines[lines.length - 1];
 
