@@ -8,11 +8,12 @@ export function PergamentCanvas(
         { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
     const stageRef = useRef(null);
     const id = useId();
+    const lineHeigth = parseInt(getComputedStyle(parent).getPropertyValue('--line-height-normal'))
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
     const isDrawing = useRef(false);
-    const [lines, setLines] = useState(loadData());
+    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -23,11 +24,27 @@ export function PergamentCanvas(
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    function loadData() {
+    function convertFromSource() {
         if (source.length <= 0) {
             return [];
         }
-        return JSON.parse(source);
+        let converted_source = JSON.parse(source);
+        converted_source.forEach((line: { penId: number, points: number[] }, index: number) => {
+            line.points = line.points.map((point: number, index: number) => {
+                return point * lineHeigth;
+            })
+        });
+        return converted_source;
+    }
+
+    function convertDataToString() {
+        let converted_source = lines.map((line: { penId: number, points: number[] }, index: number) => {
+            line.points = line.points.map((point: number, index: number) => {
+                return point / lineHeigth;
+            })
+            return line;
+        });
+        return JSON.stringify(converted_source);
     }
 
     function calculateWidth() {
@@ -69,7 +86,7 @@ export function PergamentCanvas(
         if (!editable) return;
 
         isDrawing.current = false;
-        storageAdapter.save(JSON.stringify(lines), id);
+        storageAdapter.save(convertDataToString(), id);
     }
 
     function getPenFromId(id: number) {
