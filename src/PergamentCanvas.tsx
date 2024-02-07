@@ -12,7 +12,7 @@ export function PergamentCanvas(
     const height = 400;
 
     const isDrawing = useRef(false);
-    const [lines, setLines] = useState(source.length > 0 ? JSON.parse(source) : []);
+    const [lines, setLines] = useState(loadData());
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -23,7 +23,14 @@ export function PergamentCanvas(
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    const calculateWidth = () => {
+    function loadData() {
+        if (source.length <= 0) {
+            return [];
+        }
+        return JSON.parse(source);
+    }
+
+    function calculateWidth() {
         const editorWidth = parent.innerWidth;
         const contentWidth = Math.max(
             ...lines
@@ -35,7 +42,7 @@ export function PergamentCanvas(
         return editorWidth > contentWidth ? editorWidth : contentWidth;
     };
 
-    const handelMouseDown = () => {
+    function handelMouseDown() {
         if (!editable) return;
 
         isDrawing.current = true;
@@ -44,7 +51,7 @@ export function PergamentCanvas(
         setLines([...lines, { penId: getPenFromId(getSelectedPen())?.id, points: [pos.x, pos.y] }]);
     }
 
-    const handelMouseMove = () => {
+    function handelMouseMove() {
         if (!editable) return;
         if (!isDrawing.current) return;
 
@@ -58,14 +65,14 @@ export function PergamentCanvas(
         setLines(lines.concat());
     }
 
-    const handleMouseUp = () => {
+    function handleMouseUp() {
         if (!editable) return;
 
         isDrawing.current = false;
         storageAdapter.save(JSON.stringify(lines), id);
     }
 
-    const getPenFromId = (id: number) => {
+    function getPenFromId(id: number) {
         return pens.find(p => p.id === id);
     }
 
