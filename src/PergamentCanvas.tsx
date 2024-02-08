@@ -10,7 +10,7 @@ export function PergamentCanvas(
         { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number, settings: PergamentSettings }) {
     const stageRef = useRef(null);
     const id = useId();
-    const lineHeigth = parseInt(getComputedStyle(parent).getPropertyValue('line-height'))
+    const lineHeigth = isNaN(parseInt(getComputedStyle(parent).getPropertyValue('line-height'))) ? 24 : parseInt(getComputedStyle(parent).getPropertyValue('line-height'))
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
