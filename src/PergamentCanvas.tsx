@@ -2,13 +2,15 @@ import { useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "./StorageAdapter";
 import { Pen } from "./Pen";
+import { Background } from "./Background";
+import { PergamentSettings } from "./settings";
 
 export function PergamentCanvas(
-    { parent, editable, source, storageAdapter, pens, getSelectedPen }:
-        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
+    { parent, editable, source, storageAdapter, pens, getSelectedPen, settings }:
+        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number, settings: PergamentSettings }) {
     const stageRef = useRef(null);
     const id = useId();
-    const lineHeigth = parseInt(getComputedStyle(parent).getPropertyValue('--line-height-normal'))
+    const lineHeigth = parseInt(getComputedStyle(parent).getPropertyValue('line-height'))
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
@@ -104,6 +106,12 @@ export function PergamentCanvas(
             onMouseMove={handelMouseMove}
             onMouseUp={handleMouseUp}
         >
+            <Background
+                width={width}
+                height={height}
+                settings={settings}
+                lineHeight={lineHeigth}
+            />
             <Layer>
                 {lines.map((line: { penId: number, points: number[] }, index: number) => (
                     <Line
