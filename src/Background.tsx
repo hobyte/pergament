@@ -20,7 +20,7 @@ export function Background({ width, height, lineHeight, settings }: { width: num
                 <Line
                     key={lineKey}
                     points={[0, cord, width, cord]}
-                    stroke={'#808080'}
+                    stroke={settings.backgroundColor}
                     strokeWidth={1}
                 >
                 </Line>
@@ -36,7 +36,7 @@ export function Background({ width, height, lineHeight, settings }: { width: num
                 <Line
                     key={lineKey}
                     points={[cord, 0, cord, height]}
-                    stroke={'#808080'}
+                    stroke={settings.backgroundColor}
                     strokeWidth={1}
                 >
                 </Line>

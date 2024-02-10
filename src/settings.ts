@@ -9,7 +9,8 @@ export enum Pattern {
 export interface PergamentSettings {
 	pens: Pen[]
     backgroundPattern: Pattern
-    backgroundSize: number
+    backgroundSize: number,
+    backgroundColor: string
 }
 
 export const DEFAULT_SETTINGS: PergamentSettings = {
@@ -19,5 +20,6 @@ export const DEFAULT_SETTINGS: PergamentSettings = {
 		{id: 2, name: 'code', color: '#1be43e', width: 3, tension: 1}
 	],
     backgroundPattern: Pattern.grid,
-    backgroundSize: 1
+    backgroundSize: 1,
+    backgroundColor: '#808080'
 }
