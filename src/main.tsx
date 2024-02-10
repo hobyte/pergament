@@ -1,23 +1,11 @@
-import { App, Editor, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from 'react';
 import { PergamentCanvas } from './PergamentCanvas';
 import { StorageAdapter } from './StorageAdapter';
 import { Toolbar } from './Toolbar';
-import { Pen } from './Pen';
-
-interface PergamentSettings {
-	pens: Pen[]
-}
-
-const DEFAULT_SETTINGS: PergamentSettings = {
-	pens: [
-		{id: 0, name: 'title', color: '#3739c8', width: 10, tension: 0.5},
-		{id: 1, name: 'text', color: '#f61009', width: 3, tension: 0.5},
-		{id: 2, name: 'code', color: '#1be43e', width: 3, tension: 1}
-	]
-}
+import { DEFAULT_SETTINGS, PergamentSettings } from './settings';
 
 export default class Pergament extends Plugin implements StorageAdapter {
 	settings: PergamentSettings;
@@ -66,6 +54,7 @@ export default class Pergament extends Plugin implements StorageAdapter {
 						storageAdapter={this}
 						pens={this.settings.pens}
 						getSelectedPen={() => {return this.selectedPen}}
+						settings={this.settings}
 					/>
 				</StrictMode>
 			)

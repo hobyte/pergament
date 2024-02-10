@@ -2,17 +2,20 @@ import { useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "./StorageAdapter";
 import { Pen } from "./Pen";
+import { Background } from "./Background";
+import { PergamentSettings } from "./settings";
 
 export function PergamentCanvas(
-    { parent, editable, source, storageAdapter, pens, getSelectedPen }:
-        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number }) {
+    { parent, editable, source, storageAdapter, pens, getSelectedPen, settings }:
+        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number, settings: PergamentSettings }) {
     const stageRef = useRef(null);
     const id = useId();
+    const lineHeigth = isNaN(parseInt(getComputedStyle(parent).getPropertyValue('line-height'))) ? 24 : parseInt(getComputedStyle(parent).getPropertyValue('line-height'))
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
     const isDrawing = useRef(false);
-    const [lines, setLines] = useState(source.length > 0 ? JSON.parse(source) : []);
+    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -23,7 +26,30 @@ export function PergamentCanvas(
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    const calculateWidth = () => {
+    function convertFromSource() {
+        if (source.length <= 0) {
+            return [];
+        }
+        let converted_source = JSON.parse(source);
+        converted_source.forEach((line: { penId: number, points: number[] }, index: number) => {
+            line.points = line.points.map((point: number, index: number) => {
+                return point * lineHeigth;
+            })
+        });
+        return converted_source;
+    }
+
+    function convertDataToString() {
+        let converted_source = lines.map((line: { penId: number, points: number[] }, index: number) => {
+            line.points = line.points.map((point: number, index: number) => {
+                return point / lineHeigth;
+            })
+            return line;
+        });
+        return JSON.stringify(converted_source);
+    }
+
+    function calculateWidth() {
         const editorWidth = parent.innerWidth;
         const contentWidth = Math.max(
             ...lines
@@ -35,7 +61,7 @@ export function PergamentCanvas(
         return editorWidth > contentWidth ? editorWidth : contentWidth;
     };
 
-    const handelMouseDown = () => {
+    function handelMouseDown() {
         if (!editable) return;
 
         isDrawing.current = true;
@@ -44,7 +70,7 @@ export function PergamentCanvas(
         setLines([...lines, { penId: getPenFromId(getSelectedPen())?.id, points: [pos.x, pos.y] }]);
     }
 
-    const handelMouseMove = () => {
+    function handelMouseMove() {
         if (!editable) return;
         if (!isDrawing.current) return;
 
@@ -58,14 +84,14 @@ export function PergamentCanvas(
         setLines(lines.concat());
     }
 
-    const handleMouseUp = () => {
+    function handleMouseUp() {
         if (!editable) return;
 
         isDrawing.current = false;
-        storageAdapter.save(JSON.stringify(lines), id);
+        storageAdapter.save(convertDataToString(), id);
     }
 
-    const getPenFromId = (id: number) => {
+    function getPenFromId(id: number) {
         return pens.find(p => p.id === id);
     }
 
@@ -80,6 +106,12 @@ export function PergamentCanvas(
             onMouseMove={handelMouseMove}
             onMouseUp={handleMouseUp}
         >
+            <Background
+                width={width}
+                height={height}
+                settings={settings}
+                lineHeight={lineHeigth}
+            />
             <Layer>
                 {lines.map((line: { penId: number, points: number[] }, index: number) => (
                     <Line
