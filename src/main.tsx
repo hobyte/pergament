@@ -2,9 +2,9 @@ import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from 'react';
-import { PergamentCanvas } from './PergamentCanvas';
+import { PergamentCanvas } from './ui/PergamentCanvas';
 import { StorageAdapter } from './StorageAdapter';
-import { Toolbar } from './Toolbar';
+import { Toolbar } from './ui/Toolbar';
 import { DEFAULT_SETTINGS, PergamentSettings } from './settings';
 
 export default class Pergament extends Plugin implements StorageAdapter {
