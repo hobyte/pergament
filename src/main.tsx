@@ -1,4 +1,4 @@
-import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { MarkdownView, Plugin } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode } from 'react';
@@ -106,25 +106,5 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			}
 		}
 
-	}
-}
-
-
-class SettingsTab extends PluginSettingTab {
-	plugin: Pergament;
-
-	constructor(app: App, plugin: Pergament) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const { containerEl } = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
 	}
 }
