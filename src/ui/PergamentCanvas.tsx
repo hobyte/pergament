@@ -10,7 +10,7 @@ export function PergamentCanvas(
         { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number, settings: PergamentSettings }) {
     const stageRef = useRef(null);
     const id = useId();
-    const lineHeigth = isNaN(parseInt(getComputedStyle(parent).getPropertyValue('line-height'))) ? 24 : parseInt(getComputedStyle(parent).getPropertyValue('line-height'))
+    const lineHeigth = getLineHeigth()
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
@@ -25,6 +25,16 @@ export function PergamentCanvas(
         updateWidth();
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
+
+    function getLineHeigth() {
+        const height = parseInt(getComputedStyle(parent).getPropertyValue('line-height'));
+        if (!isNaN(height)) {
+            return height
+        } else {
+            //return default value
+            return 24
+        }
+    }
 
     function convertFromSource() {
         if (source.length <= 0) {
