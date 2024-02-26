@@ -1,21 +1,23 @@
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "../StorageAdapter";
-import { Pen } from "../Pen";
 import { Background } from "./Background";
-import { PergamentSettings } from "../settings";
+import { settingsContext } from "src/main";
 
 export function PergamentCanvas(
-    { parent, editable, source, storageAdapter, pens, getSelectedPen, settings }:
-        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number, settings: PergamentSettings }) {
+    { parent, editable, source, storageAdapter, getSelectedPen }:
+        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, getSelectedPen: () => number }) {
     const stageRef = useRef(null);
     const id = useId();
+    const isDrawing = useRef(false);
+    const settings = useContext(settingsContext)
+    
     const lineHeigth = getLineHeigth()
+    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
-    const isDrawing = useRef(false);
-    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
+    const lineRef = useRef(null);
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -102,7 +104,7 @@ export function PergamentCanvas(
     }
 
     function getPenFromId(id: number) {
-        return pens.find(p => p.id === id);
+        return settings.pens.find(p => p.id === id);
     }
 
     return (
