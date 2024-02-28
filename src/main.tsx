@@ -32,11 +32,7 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			top: true
 		}
 
-		const loadPanel = (view: EditorView) => {
-			return panel
-		}
-
-		this.registerEditorExtension(showPanel.of(loadPanel));
+		this.registerEditorExtension(showPanel.of((view: EditorView) => panel));
 
 		this.registerMarkdownCodeBlockProcessor("pergament", (source, el, ctx) => {
 			let editable = true;

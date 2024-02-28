@@ -1,9 +1,10 @@
-import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "../StorageAdapter";
 import { Background } from "./Background";
 import { settingsContext } from "src/main";
 import { LineTool } from "src/tools/LineTool";
+import { linesToString, stringToLines } from "utils/linesConversion";
 
 export function PergamentCanvas(
     { parent, editable, source, storageAdapter, getSelectedPen }:
