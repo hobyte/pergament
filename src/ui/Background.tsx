@@ -1,5 +1,5 @@
 import { Layer, Line } from "react-konva";
-import { Pattern, PergamentSettings } from "./settings";
+import { Pattern, PergamentSettings } from "../settings";
 
 export function Background({ width, height, lineHeight, settings }: { width: number, height: number, lineHeight: number, settings: PergamentSettings }) {
     let lineKey = 0

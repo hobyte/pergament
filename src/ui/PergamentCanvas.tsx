@@ -1,21 +1,27 @@
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
-import { StorageAdapter } from "./StorageAdapter";
-import { Pen } from "./Pen";
+import { StorageAdapter } from "../StorageAdapter";
 import { Background } from "./Background";
-import { PergamentSettings } from "./settings";
+import { settingsContext } from "src/main";
+import { LineTool } from "src/tools/LineTool";
 
 export function PergamentCanvas(
-    { parent, editable, source, storageAdapter, pens, getSelectedPen, settings }:
-        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, pens: Pen[], getSelectedPen: () => number, settings: PergamentSettings }) {
+    { parent, editable, source, storageAdapter, getSelectedPen }:
+        { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, getSelectedPen: () => number }) {
     const stageRef = useRef(null);
+    const settings = useContext(settingsContext)
     const id = useId();
-    const lineHeigth = isNaN(parseInt(getComputedStyle(parent).getPropertyValue('line-height'))) ? 24 : parseInt(getComputedStyle(parent).getPropertyValue('line-height'))
+
+    const lineHeigth = getLineHeigth()
+    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(stringToLines(source));
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
-    const isDrawing = useRef(false);
-    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
+    const lineToolRef = useRef(null);
+
+    console.log('render');
+    
+    storageAdapter.save(linesToString(lines), id)
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -26,27 +32,14 @@ export function PergamentCanvas(
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    function convertFromSource() {
-        if (source.length <= 0) {
-            return [];
+    function getLineHeigth() {
+        const height = parseInt(getComputedStyle(parent).getPropertyValue('line-height'));
+        if (!isNaN(height)) {
+            return height
+        } else {
+            //return default value
+            return 24
         }
-        let converted_source = JSON.parse(source);
-        converted_source.forEach((line: { penId: number, points: number[] }, index: number) => {
-            line.points = line.points.map((point: number, index: number) => {
-                return point * lineHeigth;
-            })
-        });
-        return converted_source;
-    }
-
-    function convertDataToString() {
-        let converted_source = lines.map((line: { penId: number, points: number[] }, index: number) => {
-            line.points = line.points.map((point: number, index: number) => {
-                return point / lineHeigth;
-            })
-            return line;
-        });
-        return JSON.stringify(converted_source);
     }
 
     function calculateWidth() {
@@ -64,35 +57,26 @@ export function PergamentCanvas(
     function handelMouseDown() {
         if (!editable) return;
 
-        isDrawing.current = true;
-        // @ts-ignore
-        const pos = stageRef.current?.getPointerPosition();
-        setLines([...lines, { penId: getPenFromId(getSelectedPen())?.id, points: [pos.x, pos.y] }]);
+        stageRef.current
+
+        lineToolRef.current?.start(getSelectedPen())
     }
 
     function handelMouseMove() {
         if (!editable) return;
-        if (!isDrawing.current) return;
 
-        const stage = stageRef.current;
-        // @ts-ignore
-        const point = stage?.getPointerPosition();
-        let lastLine = lines[lines.length - 1];
-
-        lastLine.points = lastLine.points.concat([point.x, point.y]);
-        lines.splice(lines.length - 1, 1, lastLine);
-        setLines(lines.concat());
+        lineToolRef.current?.move()
     }
 
     function handleMouseUp() {
         if (!editable) return;
 
-        isDrawing.current = false;
-        storageAdapter.save(convertDataToString(), id);
+        lineToolRef.current?.end()
+
     }
 
     function getPenFromId(id: number) {
-        return pens.find(p => p.id === id);
+        return settings.pens.find(p => p.id === id);
     }
 
     return (
@@ -125,6 +109,14 @@ export function PergamentCanvas(
                         globalCompositeOperation={'source-over'}
                     />
                 ))}
+            </Layer>
+            <Layer>
+                <LineTool
+                    ref={lineToolRef}
+                    stageRef={stageRef}
+                    lines={lines}
+                    setLines={setLines}
+                />
             </Layer>
         </Stage>
     );

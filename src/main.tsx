@@ -1,11 +1,13 @@
-import { App, MarkdownView, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { MarkdownView, Plugin } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
-import { StrictMode } from 'react';
-import { PergamentCanvas } from './PergamentCanvas';
+import { StrictMode, createContext } from 'react';
+import { PergamentCanvas } from './ui/PergamentCanvas';
 import { StorageAdapter } from './StorageAdapter';
-import { Toolbar } from './Toolbar';
+import { Toolbar } from './ui/Toolbar';
 import { DEFAULT_SETTINGS, PergamentSettings } from './settings';
+
+export const settingsContext = createContext(DEFAULT_SETTINGS);
 
 export default class Pergament extends Plugin implements StorageAdapter {
 	settings: PergamentSettings;
@@ -20,7 +22,7 @@ export default class Pergament extends Plugin implements StorageAdapter {
 				const panelRoot = createRoot(panel.dom);
 				panelRoot.render(
 					<StrictMode>
-						<Toolbar 
+						<Toolbar
 							pens={this.settings.pens}
 							setSelectedPen={(id: number) => this.selectedPen = id}
 						/>
@@ -47,15 +49,15 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			const canvasRoot = createRoot(el);
 			canvasRoot.render(
 				<StrictMode>
-					<PergamentCanvas
-						parent={el}
-						editable={editable}
-						source={source}
-						storageAdapter={this}
-						pens={this.settings.pens}
-						getSelectedPen={() => {return this.selectedPen}}
-						settings={this.settings}
-					/>
+					<settingsContext.Provider value={this.settings}>
+						<PergamentCanvas
+							parent={el}
+							editable={editable}
+							source={source}
+							storageAdapter={this}
+							getSelectedPen={() => { return this.selectedPen }}
+						/>
+					</settingsContext.Provider>
 				</StrictMode>
 			)
 		});
@@ -106,25 +108,5 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			}
 		}
 
-	}
-}
-
-
-class SettingsTab extends PluginSettingTab {
-	plugin: Pergament;
-
-	constructor(app: App, plugin: Pergament) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const { containerEl } = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
 	}
 }
