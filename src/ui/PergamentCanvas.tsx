@@ -3,21 +3,23 @@ import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "../StorageAdapter";
 import { Background } from "./Background";
 import { settingsContext } from "src/main";
+import { LineTool } from "src/tools/LineTool";
 
 export function PergamentCanvas(
     { parent, editable, source, storageAdapter, getSelectedPen }:
         { parent: HTMLElement, editable: boolean, source: string, storageAdapter: StorageAdapter, getSelectedPen: () => number }) {
     const stageRef = useRef(null);
-    const id = useId();
-    const isDrawing = useRef(false);
     const settings = useContext(settingsContext)
-    
+    const id = useId();
+
     const lineHeigth = getLineHeigth()
     const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
-    const lineRef = useRef(null);
+    const lineToolRef = useRef(null);
+
+    storageAdapter.save(convertDataToString(), id)
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -42,23 +44,23 @@ export function PergamentCanvas(
         if (source.length <= 0) {
             return [];
         }
-        let converted_source = JSON.parse(source);
-        converted_source.forEach((line: { penId: number, points: number[] }, index: number) => {
+        let convertedSource = JSON.parse(source);
+        convertedSource.forEach((line: { penId: number, points: number[] }, index: number) => {
             line.points = line.points.map((point: number, index: number) => {
-                return point * lineHeigth;
+                return point;
             })
         });
-        return converted_source;
+        return convertedSource;
     }
 
     function convertDataToString() {
-        let converted_source = lines.map((line: { penId: number, points: number[] }, index: number) => {
+        let convertedSource = lines.map((line: { penId: number, points: number[] }, index: number) => {
             line.points = line.points.map((point: number, index: number) => {
-                return point / lineHeigth;
+                return point;
             })
             return line;
         });
-        return JSON.stringify(converted_source);
+        return JSON.stringify(convertedSource);
     }
 
     function calculateWidth() {
@@ -76,31 +78,22 @@ export function PergamentCanvas(
     function handelMouseDown() {
         if (!editable) return;
 
-        isDrawing.current = true;
-        // @ts-ignore
-        const pos = stageRef.current?.getPointerPosition();
-        setLines([...lines, { penId: getPenFromId(getSelectedPen())?.id, points: [pos.x, pos.y] }]);
+        stageRef.current
+
+        lineToolRef.current?.start(getSelectedPen())
     }
 
     function handelMouseMove() {
         if (!editable) return;
-        if (!isDrawing.current) return;
 
-        const stage = stageRef.current;
-        // @ts-ignore
-        const point = stage?.getPointerPosition();
-        let lastLine = lines[lines.length - 1];
-
-        lastLine.points = lastLine.points.concat([point.x, point.y]);
-        lines.splice(lines.length - 1, 1, lastLine);
-        setLines(lines.concat());
+        lineToolRef.current?.move()
     }
 
     function handleMouseUp() {
         if (!editable) return;
 
-        isDrawing.current = false;
-        storageAdapter.save(convertDataToString(), id);
+        lineToolRef.current?.end()
+
     }
 
     function getPenFromId(id: number) {
@@ -137,6 +130,14 @@ export function PergamentCanvas(
                         globalCompositeOperation={'source-over'}
                     />
                 ))}
+            </Layer>
+            <Layer>
+                <LineTool
+                    ref={lineToolRef}
+                    stageRef={stageRef}
+                    lines={lines}
+                    setLines={setLines}
+                />
             </Layer>
         </Stage>
     );
