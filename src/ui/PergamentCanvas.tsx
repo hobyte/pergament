@@ -1,4 +1,4 @@
-import { useContext, useId, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import { StorageAdapter } from "../StorageAdapter";
 import { Background } from "./Background";
@@ -13,13 +13,15 @@ export function PergamentCanvas(
     const id = useId();
 
     const lineHeigth = getLineHeigth()
-    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(convertFromSource());
+    const [lines, setLines] = useState<[{ penId: number, points: number[] }]>(stringToLines(source));
     const [width, setWidth] = useState(parent.innerWidth);
     const height = 400;
 
     const lineToolRef = useRef(null);
 
-    storageAdapter.save(convertDataToString(), id)
+    console.log('render');
+    
+    storageAdapter.save(linesToString(lines), id)
 
     useLayoutEffect(() => {
         function updateWidth() {
@@ -38,29 +40,6 @@ export function PergamentCanvas(
             //return default value
             return 24
         }
-    }
-
-    function convertFromSource() {
-        if (source.length <= 0) {
-            return [];
-        }
-        let convertedSource = JSON.parse(source);
-        convertedSource.forEach((line: { penId: number, points: number[] }, index: number) => {
-            line.points = line.points.map((point: number, index: number) => {
-                return point;
-            })
-        });
-        return convertedSource;
-    }
-
-    function convertDataToString() {
-        let convertedSource = lines.map((line: { penId: number, points: number[] }, index: number) => {
-            line.points = line.points.map((point: number, index: number) => {
-                return point;
-            })
-            return line;
-        });
-        return JSON.stringify(convertedSource);
     }
 
     function calculateWidth() {

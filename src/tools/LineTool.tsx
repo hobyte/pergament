@@ -18,8 +18,6 @@ export const LineTool = forwardRef(function LineTool({ stageRef, lines, setLines
     })
 
     function start(currentPenId: number) {
-        console.log('start');
-        
         isDrawing.current = true;
         penId.current = currentPenId;
 
@@ -37,8 +35,6 @@ export const LineTool = forwardRef(function LineTool({ stageRef, lines, setLines
 
     function end() {
         if (isDrawing.current) {
-            console.log('end');
-            
             isDrawing.current = false;
             const pointerPosition = stageRef.current.getPointerPosition()
 
