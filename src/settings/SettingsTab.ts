@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import Pergament from './main';
+import Pergament from '../main';
 
 class SettingsTab extends PluginSettingTab {
 	plugin: Pergament;

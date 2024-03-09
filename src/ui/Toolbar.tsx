@@ -1,4 +1,4 @@
-import { Pen } from "../Pen";
+import { Pen } from "../settings/Pen";
 
 export function Toolbar({ pens, setSelectedPen }: { pens: Pen[]; setSelectedPen: (penId: number) => void }) {
     return (

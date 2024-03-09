@@ -4,13 +4,13 @@ import { createRoot } from "react-dom/client";
 import { StrictMode, createContext } from 'react';
 import { StorageAdapter } from './StorageAdapter';
 import { Toolbar } from './ui/Toolbar';
-import { DEFAULT_SETTINGS, PergamentSettings } from './settings';
+import { DEFAULT_SETTINGS, Settings } from './settings/Settings';
 import { Canvas } from './ui/Canvas';
 
 export const settingsContext = createContext(DEFAULT_SETTINGS);
 
 export default class Pergament extends Plugin implements StorageAdapter {
-	settings: PergamentSettings;
+	settings: Settings;
 	selectedPen: number = 0;
 
 	async onload() {
