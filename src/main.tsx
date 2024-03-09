@@ -2,10 +2,10 @@ import { MarkdownView, Plugin } from 'obsidian';
 import { EditorView, Panel, showPanel } from '@codemirror/view';
 import { createRoot } from "react-dom/client";
 import { StrictMode, createContext } from 'react';
-import { PergamentCanvas } from './ui/PergamentCanvas';
 import { StorageAdapter } from './StorageAdapter';
 import { Toolbar } from './ui/Toolbar';
 import { DEFAULT_SETTINGS, PergamentSettings } from './settings';
+import { Canvas } from './ui/Canvas';
 
 export const settingsContext = createContext(DEFAULT_SETTINGS);
 
@@ -41,21 +41,8 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			if (mdView?.getMode() === 'preview') {
 				editable = false;
 			}
-
-			const canvasRoot = createRoot(el);
-			canvasRoot.render(
-				<StrictMode>
-					<settingsContext.Provider value={this.settings}>
-						<PergamentCanvas
-							parent={el}
-							editable={editable}
-							source={source}
-							storageAdapter={this}
-							getSelectedPen={() => { return this.selectedPen }}
-						/>
-					</settingsContext.Provider>
-				</StrictMode>
-			)
+			
+			new Canvas(el);
 		});
 	}
 

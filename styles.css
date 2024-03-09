@@ -1,4 +1,4 @@
-.pergament-stage {
+.pergament-canvas {
     background-color: var(--background-primary-alt);
     border: var(--border-width) solid var(--interactive-hover);
     cursor:crosshair;
