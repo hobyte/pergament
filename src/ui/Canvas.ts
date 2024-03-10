@@ -1,13 +1,25 @@
+import { Layer } from "konva/lib/Layer";
 import { Stage } from "konva/lib/Stage";
+import { Line } from "konva/lib/shapes/Line";
+import { BackgroundPattern } from "src/settings/Background";
+import { Settings } from "src/settings/Settings";
 
 export class Canvas {
+    private settings: Settings
     private parent: HTMLElement
     private stage: Stage
+    private backgroundLayer: Layer
 
-    constructor(parent: HTMLElement) {
+    constructor(parent: HTMLElement, settings: Settings) {
+        this.settings = settings;
         this.parent = parent;
         this.createStage(parent);
         this.watchParentResize();
+
+        //draw background
+        this.backgroundLayer = new Layer({name: 'background'});
+        this.stage.add(this.backgroundLayer);
+        this.drawBackground();
     }
 
     private createStage(parent: HTMLElement): void {
@@ -24,7 +36,8 @@ export class Canvas {
     private watchParentResize(): void {
         const observer = new ResizeObserver(entries => {
             entries.forEach(entry => {
-                this.resizeStage()
+                this.resizeStage();
+                this.drawBackground();
             });
         });
 
@@ -43,6 +56,36 @@ export class Canvas {
                 width: parentWitdh,
                 height: 400
             })
+        }
+    }
+
+    private drawBackground(): void {
+        const stageWidth = this.stage.width();
+        const stageHeight = this.stage.height();
+
+        this.backgroundLayer.destroyChildren();
+
+        switch (this.settings.background.pattern) {
+            case BackgroundPattern.grid:
+                //draw vertical lines
+                for (let x = 0; x < stageWidth; x += this.settings.background.size) {
+                    this.backgroundLayer.add(new Line({
+                        stroke: this.settings.background.color,
+                        points: [x, 0, x, stageHeight],
+                        name: 'vertical'
+                    }))
+                }
+                //no break to run next case and draw lines of grid
+            case BackgroundPattern.line:
+                //draw horizontal lines
+                for (let y = 0; y < stageHeight; y += this.settings.background.size) {
+                    this.backgroundLayer.add(new Line({
+                        stroke: this.settings.background.color,
+                        points: [0,y, stageWidth, y],
+                        name: 'horizontal'
+                    }))
+                }
+                break;
         }
     }
 }

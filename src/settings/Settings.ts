@@ -12,5 +12,5 @@ export const DEFAULT_SETTINGS: Settings = {
         new Pen('text', '#f61009', 3, 0.5, false),
         new Pen('code', '#1be43e', 3, 1, false),
 	],
-    background: new Background(BackgroundPattern.grid, 1, '#808080')
+    background: new Background(BackgroundPattern.grid, 20, '#808080')
 }

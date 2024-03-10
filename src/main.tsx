@@ -42,7 +42,7 @@ export default class Pergament extends Plugin implements StorageAdapter {
 				editable = false;
 			}
 			
-			new Canvas(el);
+			new Canvas(el, this.settings);
 		});
 	}
 
