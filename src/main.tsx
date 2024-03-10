@@ -46,10 +46,6 @@ export default class Pergament extends Plugin implements StorageAdapter {
 		});
 	}
 
-	onunload() {
-
-	}
-
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
