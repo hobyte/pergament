@@ -2,21 +2,27 @@ import { Layer } from "konva/lib/Layer";
 import { KonvaEventListener } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
 import { Line } from "konva/lib/shapes/Line";
+import { StorageAdapter } from "src/StorageAdapter";
 import { BackgroundPattern } from "src/settings/Background";
 import { Settings } from "src/settings/Settings";
 
 export class Canvas {
+    private id: string
     private editable: boolean
+    private storage: StorageAdapter
     private settings: Settings
     private parent: HTMLElement
     private stage: Stage
     private backgroundLayer: Layer
     private drawingLayer: Layer
 
-    constructor(parent: HTMLElement, settings: Settings, editable: boolean) {
+    constructor(parent: HTMLElement, settings: Settings, storage: StorageAdapter, source: string, editable: boolean) {
         this.editable = editable;
+        this.storage = storage;
         this.settings = settings;
         this.parent = parent;
+
+        this.id = (Math.random() + 1).toString(36).substring(7);
         this.createStage(parent);
         this.watchParentResize();
 
@@ -26,16 +32,20 @@ export class Canvas {
         this.drawBackground();
 
         //event listeners and layer for tools
-        this.drawingLayer = new Layer({name: 'draw'});
+        this.drawingLayer = new Layer({ name: 'draw' });
         this.stage.add(this.drawingLayer)
         this.stage.on('mousedown touchstart', event => this.startTool(event));
         this.stage.on('mousemove touchmove', event => this.moveTool(event));
         this.stage.on('mouseup touchend', event => this.endTool(event));
+
+        //load saved lines
+        this.loadFromString(source)
     }
 
     private createStage(parent: HTMLElement): void {
         const container = document.createElement('div');
         container.classList.add('pergament-canvas')
+        container.id = this.id;
         parent.appendChild(container);
         this.stage = new Stage({
             container: container,
@@ -57,6 +67,9 @@ export class Canvas {
 
     private resizeStage(): void {
         const parentWitdh = this.parent.getBoundingClientRect().width;
+        if (!parentWitdh) {
+            return
+        }
         if (parentWitdh <= 400) {
             this.stage.size({
                 width: parentWitdh,
@@ -115,6 +128,26 @@ export class Canvas {
     private endTool(event) {
         if (this.editable) {
             this.settings.pens[0].end(this.drawingLayer);
+            //save canvas content to File
+            this.saveToFile();
         }
+    }
+
+    private saveToFile() {
+        const lines = this.drawingLayer
+            .getChildren()
+            .map((line) => {
+                let attr = line.attrs;
+                attr.name = line.name();
+                return attr;
+            })
+        this.storage.save(JSON.stringify(lines), this.id);
+    }
+
+    private loadFromString(source: string) {
+        const lineAttrs = JSON.parse(source);
+        lineAttrs.forEach(attr => {
+            this.drawingLayer.add(new Line(attr))
+        });
     }
 }

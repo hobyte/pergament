@@ -51,6 +51,7 @@ export class Pen extends Tool {
         
         this.drawing = true;
         this.currentLine = new Line({
+            name: this.name,
             stroke: this.color,
             strokeWidth: this.width,
             tension: this.tension,
