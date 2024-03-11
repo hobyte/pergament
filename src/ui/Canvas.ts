@@ -145,6 +145,10 @@ export class Canvas {
     }
 
     private loadFromString(source: string) {
+        if (source.length <= 0) {
+            //no lines to add
+            return
+        }
         const lineAttrs = JSON.parse(source);
         lineAttrs.forEach(attr => {
             this.drawingLayer.add(new Line(attr))
