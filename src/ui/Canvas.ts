@@ -6,16 +6,15 @@ import { BackgroundPattern } from "src/settings/Background";
 import { Settings } from "src/settings/Settings";
 
 export class Canvas {
+    private editable: boolean
     private settings: Settings
     private parent: HTMLElement
     private stage: Stage
     private backgroundLayer: Layer
     private drawingLayer: Layer
 
-    private drawing = false
-    private currentLine: Line
-
-    constructor(parent: HTMLElement, settings: Settings) {
+    constructor(parent: HTMLElement, settings: Settings, editable: boolean) {
+        this.editable = editable;
         this.settings = settings;
         this.parent = parent;
         this.createStage(parent);
@@ -102,39 +101,20 @@ export class Canvas {
     }
 
     private startTool(event) {
-        const pos = this.stage.getPointerPosition();
-        //check of pos is null
-        if (!pos) {
-            console.log('failed to get cursor position')
-            return
+        if (this.editable) {
+            this.settings.pens[0].start(this.drawingLayer);
         }
-        
-        this.drawing = true;
-        this.currentLine = new Line({
-            stroke: '#F74F23',
-            strokeWidth: 5,
-            lineCap: 'round',
-            lineJoin: 'round',
-            points: [pos.x, pos.y, pos.x, pos.y]
-        })
-        this.drawingLayer.add(this.currentLine);
     }
 
     private moveTool(event) {
-        if (!this.drawing) {
-            return;
+        if (this.editable) {
+            this.settings.pens[0].move(this.drawingLayer);
         }
-
-        const pos = this.stage.getPointerPosition();
-        //check of pos is null
-        if (!pos) {
-            console.log('failed to get cursor position')
-            return
-        }
-        this.currentLine.points(this.currentLine.points().concat([pos.x, pos.y]))
     }
 
     private endTool(event) {
-        this.drawing = false;
+        if (this.editable) {
+            this.settings.pens[0].end(this.drawingLayer);
+        }
     }
 }

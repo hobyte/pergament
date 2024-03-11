@@ -41,8 +41,8 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			if (mdView?.getMode() === 'preview') {
 				editable = false;
 			}
-			
-			new Canvas(el, this.settings);
+
+			new Canvas(el, this.settings, editable);
 		});
 	}
 

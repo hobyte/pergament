@@ -1,6 +1,6 @@
-import { Pen } from "../settings/Pen";
+import { Tool } from "../tools/Tool";
 
-export function Toolbar({ pens, setSelectedPen }: { pens: Pen[]; setSelectedPen: (penId: number) => void }) {
+export function Toolbar({ pens, setSelectedPen }: { pens: Tool[]; setSelectedPen: (penId: number) => void }) {
     return (
       <div>
         {

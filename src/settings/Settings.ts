@@ -1,8 +1,9 @@
-import { Pen } from "./Pen"
+import { Pen } from "src/tools/Pen"
+import { Tool } from "../tools/Tool"
 import { Background, BackgroundPattern } from "./Background"
 
 export interface Settings {
-	pens: Pen[]
+	pens: Tool[]
     background: Background
 }
 
