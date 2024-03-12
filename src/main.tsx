@@ -1,38 +1,29 @@
 import { MarkdownView, Plugin } from 'obsidian';
-import { EditorView, Panel, showPanel } from '@codemirror/view';
-import { createRoot } from "react-dom/client";
-import { StrictMode, createContext } from 'react';
+import { EditorView, Panel, showPanel, getPanel } from '@codemirror/view';
 import { StorageAdapter } from './StorageAdapter';
-import { Toolbar } from './ui/Toolbar';
 import { DEFAULT_SETTINGS, Settings } from './settings/Settings';
 import { Canvas } from './ui/Canvas';
-
-export const settingsContext = createContext(DEFAULT_SETTINGS);
+import { Toolbar } from './ui/Toolbar';
 
 export default class Pergament extends Plugin implements StorageAdapter {
-	settings: Settings;
-	selectedPen: number = 0;
+	private settings: Settings;
 
-	async onload() {
+	public async onload() {
 		await this.loadSettings()
 
-		const panel: Panel = {
+		/*define panel here so it can be accesed by codemirror. Mounting the panel does not
+		work when the createPanel function is on class level.*/
+		const panel =  {
 			dom: document.createElement('div'),
+			toolbar: new Toolbar(this.settings),
 			mount: () => {
-				const panelRoot = createRoot(panel.dom);
-				panelRoot.render(
-					<StrictMode>
-						<Toolbar
-							pens={this.settings.pens}
-							setSelectedPen={(id: number) => this.selectedPen = id}
-						/>
-					</StrictMode>
-				)
+				const toolbar = new Toolbar(this.settings)
+				toolbar.mount(panel.dom)
 			},
 			top: true
 		}
-
-		this.registerEditorExtension(showPanel.of((view: EditorView) => panel));
+		const createPanel = (view: EditorView) => panel;
+		this.registerEditorExtension(showPanel.of(createPanel));
 
 		this.registerMarkdownCodeBlockProcessor("pergament", (source, el, ctx) => {
 			let editable = true;
@@ -46,15 +37,28 @@ export default class Pergament extends Plugin implements StorageAdapter {
 		});
 	}
 
-	async loadSettings() {
+	private async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
-	async saveSettings() {
+	private async saveSettings() {
 		await this.saveData(this.settings);
 	}
 
-	save(content: string, id: string): void {
+	private createPanel(view: EditorView): Panel {
+		const panel =  {
+			dom: document.createElement('div'),
+			toolbar: new Toolbar(this.settings),
+			mount: () => {
+				const toolbar = new Toolbar(this.settings)
+				toolbar.mount(panel.dom)
+			},
+			top: true
+		}
+		return panel
+	}
+
+	public save(content: string, id: string): void {
 		const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (mdView?.getMode() === 'preview') return;
 
