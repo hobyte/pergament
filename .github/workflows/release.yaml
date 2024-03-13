@@ -10,6 +10,7 @@ jobs:
     uses: ./.github/workflows/setup.yaml
   build:
     runs-on: ubuntu-latest
+    needs: [setup]
     steps:
       - name: Build plugin
         run: npm run build
