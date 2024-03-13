@@ -8,13 +8,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
+        with:
+          #for super-linter
+          fetch-depth: 0
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.2  
           
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Super-Linter
         uses: super-linter/super-linter@v6.3.0
         env:
