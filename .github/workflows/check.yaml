@@ -3,12 +3,18 @@ name: check project
 on: [push]
 
 jobs:
-  setup:
-    uses: ./.github/workflows/setup.yaml
   build:
     runs-on: ubuntu-latest
-    needs: [setup]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.2  
+          
+      - name: Install Dependencies
+        run: npm ci
+        
       - name: Super-Linter
         uses: super-linter/super-linter@v6.3.0
         env:
