@@ -5,10 +5,12 @@ import { Line } from "konva/lib/shapes/Line";
 import { StorageAdapter } from "src/StorageAdapter";
 import { BackgroundPattern } from "src/settings/Background";
 import { Settings } from "src/settings/Settings";
+import { Toolbar } from "./Toolbar";
 
 export class Canvas {
     private id: string
     private editable: boolean
+    private toolbar: Toolbar
     private storage: StorageAdapter
     private settings: Settings
     private parent: HTMLElement
@@ -16,8 +18,9 @@ export class Canvas {
     private backgroundLayer: Layer
     private drawingLayer: Layer
 
-    constructor(parent: HTMLElement, settings: Settings, storage: StorageAdapter, source: string, editable: boolean) {
+    constructor(parent: HTMLElement, settings: Settings, storage: StorageAdapter, toolbar: Toolbar, source: string, editable: boolean) {
         this.editable = editable;
+        this.toolbar = toolbar;
         this.storage = storage;
         this.settings = settings;
         this.parent = parent;
@@ -113,21 +116,23 @@ export class Canvas {
         }
     }
 
-    private startTool(event) {
+    private startTool(event) { 
+        console.log('start');
+        
         if (this.editable) {
-            this.settings.pens[0].start(this.drawingLayer);
+            this.toolbar.selectedTool.start(this.drawingLayer);
         }
     }
 
     private moveTool(event) {
         if (this.editable) {
-            this.settings.pens[0].move(this.drawingLayer);
+            this.toolbar.selectedTool.move(this.drawingLayer);
         }
     }
 
     private endTool(event) {
         if (this.editable) {
-            this.settings.pens[0].end(this.drawingLayer);
+            this.toolbar.selectedTool.end(this.drawingLayer);
             //save canvas content to File
             this.saveToFile();
         }

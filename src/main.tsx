@@ -7,18 +7,20 @@ import { Toolbar } from './ui/Toolbar';
 
 export default class Pergament extends Plugin implements StorageAdapter {
 	private settings: Settings;
+	private toolbar: Toolbar;
 
 	public async onload() {
 		await this.loadSettings()
 
 		/*define panel here so it can be accesed by codemirror. Mounting the panel does not
 		work when the createPanel function is on class level.*/
+		this.toolbar = new Toolbar(this.settings)
 		const panel =  {
 			dom: document.createElement('div'),
-			toolbar: new Toolbar(this.settings),
+			//toolbar: new Toolbar(this.settings),
 			mount: () => {
-				const toolbar = new Toolbar(this.settings)
-				toolbar.mount(panel.dom)
+				//const toolbar = new Toolbar(this.settings)
+				this.toolbar.mount(panel.dom)
 			},
 			top: true
 		}
@@ -33,7 +35,15 @@ export default class Pergament extends Plugin implements StorageAdapter {
 				editable = false;
 			}
 
-			new Canvas(el, this.settings, this, source, editable);
+			//get panel from editor
+			//@ts-ignore
+			const editorView = mdView?.editor.cm;
+			if (editorView) {
+				const editorPanel = getPanel(editorView, createPanel);
+				new Canvas(el, this.settings, this, this.toolbar, source, editable);
+				console.log(editorPanel)
+			}
+
 		});
 	}
 
