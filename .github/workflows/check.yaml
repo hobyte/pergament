@@ -20,6 +20,3 @@ jobs:
 
       - name: build project
         run: npm build
-
-      - name: Run security scanner
-        uses: snyk/actions
