@@ -3,11 +3,20 @@ name: check project
 on: [push]
 
 jobs:
-  Setup:
-      uses: ./.github/workflows/setup.yaml
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          
+      - name: Install Dependencies
+        run: npm ci
+
       - name: Check formatting
         run: npm run lint
 
