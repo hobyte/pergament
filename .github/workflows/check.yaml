@@ -1,0 +1,18 @@
+name: check project
+
+on: [push]
+
+jobs:
+  Setup:
+      uses: ./.github/workflows/setup.yaml
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check formatting
+        run: npm run lint
+
+      - name: build project
+        run: npm build
+
+      - name: Run security scanner
+        uses: snyk/snyk
