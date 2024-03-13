@@ -3,29 +3,16 @@ name: check project
 on: [push, pull_request]
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          #for super-linter
-          fetch-depth: 0
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4.0.2  
-          
-      - name: Install Dependencies
-        run: npm ci
   lint:
     runs-on: ubuntu-latest
-    needs: [setup]
     permissions:
       contents: read
       packages: read
       # To report GitHub Actions status checks
       statuses: write
     steps:
+      - name: setup
+        uses: ./.github/workflows/setup.yaml
       - name: Super-Linter
         uses: super-linter/super-linter@v6.3.0
         env:
@@ -36,7 +23,8 @@ jobs:
           path: super-linter.log
   build:
     runs-on: ubuntu-latest
-    needs: [setup]
     steps:
+      - name: setup
+        uses: ./.github/workflows/setup.yaml
       - name: build project
         run: npm build
