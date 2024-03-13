@@ -3,13 +3,8 @@ name: check project
 on: [push, pull_request]
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
-      # To report GitHub Actions status checks
-      statuses: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
@@ -22,7 +17,15 @@ jobs:
           
       - name: Install Dependencies
         run: npm ci
-
+  lint:
+    runs-on: ubuntu-latest
+    needs: [setup]
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+    steps:
       - name: Super-Linter
         uses: super-linter/super-linter@v6.3.0
         env:
@@ -31,6 +34,9 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           path: super-linter.log
-
+  build:
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
       - name: build project
         run: npm build
