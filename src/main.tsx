@@ -34,16 +34,8 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			if (mdView?.getMode() === 'preview') {
 				editable = false;
 			}
-
-			//get panel from editor
-			//@ts-ignore
-			const editorView = mdView?.editor.cm;
-			if (editorView) {
-				const editorPanel = getPanel(editorView, createPanel);
-				new Canvas(el, this.settings, this, this.toolbar, source, editable);
-				console.log(editorPanel)
-			}
-
+			
+			new Canvas(el, this.settings, this, this.toolbar, source, editable);
 		});
 	}
 
