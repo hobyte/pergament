@@ -1,5 +1,5 @@
 import { Layer } from "konva/lib/Layer";
-import { KonvaEventListener } from "konva/lib/Node";
+import { KonvaEventListener, KonvaEventObject } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
 import { Line } from "konva/lib/shapes/Line";
 import { StorageAdapter } from "src/StorageAdapter";
@@ -116,21 +116,19 @@ export class Canvas {
         }
     }
 
-    private startTool(event) { 
-        console.log('start');
-        
+    private startTool(event: KonvaEventObject<any>) { 
         if (this.editable) {
             this.toolbar.selectedTool.start(this.drawingLayer);
         }
     }
 
-    private moveTool(event) {
+    private moveTool(event: KonvaEventObject<any>) {
         if (this.editable) {
             this.toolbar.selectedTool.move(this.drawingLayer);
         }
     }
 
-    private endTool(event) {
+    private endTool(event: KonvaEventObject<any>) {
         if (this.editable) {
             this.toolbar.selectedTool.end(this.drawingLayer);
             //save canvas content to File
@@ -155,7 +153,7 @@ export class Canvas {
             return
         }
         const lineAttrs = JSON.parse(source);
-        lineAttrs.forEach(attr => {
+        lineAttrs.forEach((attr: any) => {
             this.drawingLayer.add(new Line(attr))
         });
     }
