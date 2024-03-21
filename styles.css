@@ -1,7 +1,20 @@
 .pergament-canvas {
     background-color: var(--background-primary-alt);
     border: var(--border-width) solid var(--interactive-hover);
-    cursor:crosshair;
-    overflow-y: hidden;
-    overflow-x: auto;
+    cursor: crosshair;
+    overflow: auto hidden;
+}
+
+.add-button {
+    margin-top: 1em;
+}
+
+.settings-header {
+    font-variant: var(--h4-variant);
+    line-height: var(--h1-lin4-height);
+    font-size: var(--h4-size);
+    color: var(--h4-color);
+    font-weight: var(--h4-weight);
+    font-style: var(--h4-style);
+    font-family: var(--h4-font);
 }

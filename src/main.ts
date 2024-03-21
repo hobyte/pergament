@@ -1,19 +1,21 @@
 import { MarkdownView, Plugin } from 'obsidian';
-import { EditorView, Panel, showPanel, getPanel } from '@codemirror/view';
+import { EditorView, showPanel } from '@codemirror/view';
 import { StorageAdapter } from './StorageAdapter';
 import { DEFAULT_SETTINGS, Settings } from './settings/Settings';
 import { Canvas } from './ui/Canvas';
 import { Toolbar } from './ui/Toolbar';
+import { Background } from './settings/Background';
+import { Pen } from './tools/Pen';
+import { SettingsTab } from './ui/SettingsTab'
 
 export default class Pergament extends Plugin implements StorageAdapter {
-	private settings: Settings;
+	public settings: Settings;
 	private toolbar: Toolbar;
 
 	public async onload() {
 		await this.loadSettings()
+		this.addSettingTab(new SettingsTab(this.app, this))
 
-		/*define panel here so it can be accesed by codemirror. Mounting the panel does not
-		work when the createPanel function is on class level.*/
 		this.toolbar = new Toolbar(this.settings)
 		const panel =  {
 			dom: document.createElement('div'),
@@ -37,27 +39,6 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			
 			new Canvas(el, this.settings, this, this.toolbar, source, editable);
 		});
-	}
-
-	private async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	private async saveSettings() {
-		await this.saveData(this.settings);
-	}
-
-	private createPanel(view: EditorView): Panel {
-		const panel =  {
-			dom: document.createElement('div'),
-			toolbar: new Toolbar(this.settings),
-			mount: () => {
-				const toolbar = new Toolbar(this.settings)
-				toolbar.mount(panel.dom)
-			},
-			top: true
-		}
-		return panel
 	}
 
 	public save(content: string, id: string): void {
@@ -93,5 +74,36 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			}
 		}
 
+	}
+
+	async loadSettings() {
+		const settingsData = await this.loadData();
+
+		if (settingsData !== null) {
+			let newSettings = {
+				pens: settingsData.pens.map((pen: any) => {
+					return new Pen(
+						pen._name, 
+						pen._color, 
+						pen._width, 
+						pen._tension, 
+						pen._removable
+					)
+				}),
+				background: new Background(
+					settingsData.background._pattern, 
+					settingsData.background._size, 
+					settingsData.background._color
+				)
+			};
+			this.settings = newSettings;
+		} else {
+			this.settings = DEFAULT_SETTINGS,
+			this.saveSettings();
+		}
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
 	}
 }

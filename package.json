@@ -1,5 +1,5 @@
 {
-	"name": "Pergament",
+	"name": "pergament",
 	"version": "0.1.0",
 	"description": "Pergament is a handwriting and drawing Plugin for Obsidian",
 	"main": "main.js",
