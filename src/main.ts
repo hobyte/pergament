@@ -6,13 +6,15 @@ import { Canvas } from './ui/Canvas';
 import { Toolbar } from './ui/Toolbar';
 import { Background } from './settings/Background';
 import { Pen } from './tools/Pen';
+import { SettingsTab } from './ui/SettingsTab'
 
 export default class Pergament extends Plugin implements StorageAdapter {
-	private settings: Settings;
+	public settings: Settings;
 	private toolbar: Toolbar;
 
 	public async onload() {
 		await this.loadSettings()
+		this.addSettingTab(new SettingsTab(this.app, this))
 
 		this.toolbar = new Toolbar(this.settings)
 		const panel =  {
