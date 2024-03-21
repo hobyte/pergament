@@ -15,6 +15,8 @@ export class SettingsTab extends PluginSettingTab {
 		const containerEl = this.containerEl;
 		containerEl.empty();
 
+		containerEl.createEl('div', {text: 'Restart Obsidian to apply changes', cls: 'settings-hint'})
+
 		//Background
 		const backgroundContainer = containerEl.createEl('div');
 		backgroundContainer.createEl('h1').innerText = 'Background';
