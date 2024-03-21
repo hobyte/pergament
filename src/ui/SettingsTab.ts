@@ -27,13 +27,12 @@ export class SettingsTab extends PluginSettingTab {
 			.addDropdown(dropdown => {
 				for (const key in BackgroundPattern) {
 					if (Number(key) >= 0) {
-						dropdown.addOption(key, BackgroundPattern[key]);
+						dropdown.addOption(BackgroundPattern[key], BackgroundPattern[key]);
 					}
 				}
-				dropdown.setValue(String(this.plugin.settings.background.pattern))
+				dropdown.setValue(BackgroundPattern[this.plugin.settings.background.pattern])
 				dropdown.onChange(async (value) => {
-					const key = Number(value)
-					let pattern = BackgroundPattern[value as keyof typeof BackgroundPattern];
+					let pattern = BackgroundPattern[value as keyof typeof BackgroundPattern]
 					this.plugin.settings.background.pattern = pattern;
 					this.plugin.saveSettings().then(() => console.log('saved settings'))
 				})
