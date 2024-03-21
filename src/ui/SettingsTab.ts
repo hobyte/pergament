@@ -1,6 +1,7 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import Pergament from '../main';
 import { BackgroundPattern } from 'src/settings/Background';
+import { Pen } from 'src/tools/Pen';
 
 export class SettingsTab extends PluginSettingTab {
 	plugin: Pergament;
@@ -121,6 +122,27 @@ export class SettingsTab extends PluginSettingTab {
 						}
 					})
 				})
+
+			if (pen.removable) {
+				penDetails.createEl('button', {text: 'Delete'}).onclick = () => {
+					this.plugin.settings.pens.remove(pen);
+					this.plugin.saveSettings().then(() => console.log('saved settings'));
+					this.display();
+				}
+			}
 		})
+		//add new pen
+		penContainer.createEl('button', {text: 'Add Pen'}).onclick = () => {
+			const pen = new Pen(
+				'new Pen',
+				'#6869E3',
+				3,
+				3,
+				true
+			)
+			this.plugin.settings.pens.push(pen)
+			this.plugin.saveSettings().then(() => console.log('saved settings'))
+			this.display();
+		}
 	}
 }
