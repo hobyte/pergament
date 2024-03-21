@@ -17,19 +17,18 @@ export class SettingsTab extends PluginSettingTab {
 		//Background
 		const backgroundContainer = containerEl.createEl('div');
 		backgroundContainer.createEl('h1').innerText = 'Background';
-		backgroundContainer.createEl('div').innerText = 'Restart Obsidian after changing a setting'
 
 		new Setting(backgroundContainer)
 			.setName('Pattern')
 			.setDesc('Choose a pattern to use for the background.')
 			.addDropdown(dropdown => {
-				for(const key in BackgroundPattern) {
+				for (const key in BackgroundPattern) {
 					if (Number(key) >= 0) {
 						dropdown.addOption(key, BackgroundPattern[key]);
 					}
 				}
 				dropdown.setValue(String(this.plugin.settings.background.pattern))
-				dropdown.onChange(async (value) =>{
+				dropdown.onChange(async (value) => {
 					const key = Number(value)
 					let pattern = BackgroundPattern[value as keyof typeof BackgroundPattern];
 					this.plugin.settings.background.pattern = pattern;
@@ -61,5 +60,67 @@ export class SettingsTab extends PluginSettingTab {
 					this.plugin.saveSettings().then(() => console.log('saved settings'))
 				})
 			})
+
+		//Pens
+		const penContainer = containerEl.createEl('div')
+		backgroundContainer.createEl('h1').innerText = 'Pens';
+
+		this.plugin.settings.pens.forEach(pen => {
+			const penDetails = backgroundContainer.createEl('details')
+			penDetails.createEl('summary', {text: pen.name})
+
+			new Setting(penDetails)
+				.setName('Name')
+				.setDesc('Choose the name of the pen')
+				.addText(textArea => {
+					textArea.setValue(pen.name);
+					textArea.onChange(value => {
+						if (value !== '') {
+							pen.name = value;
+							this.plugin.saveSettings().then(() => console.log('saved settings'))
+						}
+					})
+				})
+			new Setting(penDetails)
+				.setName('Color')
+				.setDesc(`Choose the color of ${pen.name}`)
+				.addColorPicker(picker => {
+					picker.setValue(pen.color)
+					picker.onChange(color => {
+						pen.color = color
+						this.plugin.saveSettings().then(() => console.log('saved settings'))
+					})
+				})
+			new Setting(penDetails)
+				.setName('Size')
+				.setDesc(`Choose the thickness of ${pen.name}.`)
+				.addText(textArea => {
+					textArea.setValue(String(pen.width))
+					textArea.onChange(value => {
+						if (!isNaN(Number(value))) {
+							const width = Number(value)
+							pen.width = width > 0 ? width : 1;
+							this.plugin.saveSettings().then(() => console.log('saved settings'))
+						} else {
+							textArea.setValue(String(this.plugin.settings.background.size))
+						}
+					})
+				})
+			new Setting(penDetails)
+				.setName('Tension')
+				.setDesc(`Choose the Tesnion of ${pen.name}. Higher values will result in a more curvy line.`)
+				.addText(textArea => {
+					textArea.setValue(String(pen.width))
+					textArea.onChange(value => {
+						if (!isNaN(Number(value))) {
+							const tension = Number(value)
+							pen.tension = tension >= 0 ? tension : 1;
+							this.plugin.saveSettings().then(() => console.log('saved settings'))
+						} else {
+							textArea.setValue(String(this.plugin.settings.background.size))
+						}
+					})
+				})
+		})
 	}
 }

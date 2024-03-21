@@ -17,6 +17,10 @@ export abstract class Tool {
 		return this._name;
 	}
 
+	public set name(value: string) {
+		this._name = value;
+	}
+
 	public abstract start(layer: Layer): void;
 	public abstract move(layer: Layer): void;
 	public abstract end(layer: Layer): void;
