@@ -68,7 +68,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		this.plugin.settings.pens.forEach(pen => {
 			const penDetails = backgroundContainer.createEl('details')
-			penDetails.createEl('summary', {text: pen.name})
+			penDetails.createEl('summary', { text: pen.name, cls: 'settings-header' })
 
 			new Setting(penDetails)
 				.setName('Name')
@@ -124,7 +124,10 @@ export class SettingsTab extends PluginSettingTab {
 				})
 
 			if (pen.removable) {
-				penDetails.createEl('button', {text: 'Delete'}).onclick = () => {
+				penDetails.createEl('button', {
+					text: 'Delete',
+					cls: 'mod-warning'
+				}).onclick = () => {
 					this.plugin.settings.pens.remove(pen);
 					this.plugin.saveSettings().then(() => console.log('saved settings'));
 					this.display();
@@ -132,7 +135,10 @@ export class SettingsTab extends PluginSettingTab {
 			}
 		})
 		//add new pen
-		penContainer.createEl('button', {text: 'Add Pen'}).onclick = () => {
+		penContainer.createEl('button', { 
+			text: 'Add Pen', 
+			cls: 'add-button' 
+		}).onclick = () => {
 			const pen = new Pen(
 				'new Pen',
 				'#6869E3',
