@@ -18,3 +18,7 @@
     font-style: var(--h4-style);
     font-family: var(--h4-font);
 }
+
+.settings-hint {
+    color: var(--color-orange)
+}
