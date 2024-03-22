@@ -15,7 +15,27 @@ export class SettingsTab extends PluginSettingTab {
 		const containerEl = this.containerEl;
 		containerEl.empty();
 
-		containerEl.createEl('div', {text: 'Restart Obsidian to apply changes', cls: 'settings-hint'})
+		containerEl.createEl('div', { text: 'Restart Obsidian to apply changes', cls: 'settings-hint' })
+
+		//General
+		const generalContainer = containerEl.createEl('div')
+		generalContainer.createEl('h1', { text: 'General' })
+
+		new Setting(generalContainer)
+			.setName('Canvas Height')
+			.setDesc('Choose the default height of the canvas.')
+			.addText(textArea => {
+				textArea.setValue(String(this.plugin.settings.defaultCanvasHeight))
+				textArea.onChange(value => {
+					if (!isNaN(Number(value))) {
+						const size = Number(value)
+						this.plugin.settings.defaultCanvasHeight = size > 0 ? size : 1;
+						this.plugin.saveSettings().then(() => console.log('saved settings'))
+					} else {
+						textArea.setValue(String(this.plugin.settings.defaultCanvasHeight))
+					}
+				})
+			})
 
 		//Background
 		const backgroundContainer = containerEl.createEl('div');
@@ -136,9 +156,9 @@ export class SettingsTab extends PluginSettingTab {
 			}
 		})
 		//add new pen
-		penContainer.createEl('button', { 
-			text: 'Add Pen', 
-			cls: 'add-button' 
+		penContainer.createEl('button', {
+			text: 'Add Pen',
+			cls: 'add-button'
 		}).onclick = () => {
 			const pen = new Pen(
 				'new Pen',

@@ -53,7 +53,7 @@ export class Canvas {
         this.stage = new Stage({
             container: container,
             width: 400,
-            height: 400
+            height: this.settings.defaultCanvasHeight
         })
     }
 

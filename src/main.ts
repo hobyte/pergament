@@ -81,6 +81,7 @@ export default class Pergament extends Plugin implements StorageAdapter {
 
 		if (settingsData !== null) {
 			let newSettings = {
+				defaultCanvasHeight: settingsData.defaultCanvasHeight,
 				pens: settingsData.pens.map((pen: any) => {
 					return new Pen(
 						pen._name, 
