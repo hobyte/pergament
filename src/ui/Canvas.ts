@@ -43,6 +43,10 @@ export class Canvas {
 
         //load saved lines
         this.loadFromString(source)
+
+        //set Interval for saving
+        const interval = this.settings.saveInterval*1000;
+        setInterval(() => this.saveToFile(), interval)
     }
 
     private createStage(parent: HTMLElement): void {
@@ -131,12 +135,12 @@ export class Canvas {
     private endTool(event: KonvaEventObject<any>) {
         if (this.editable) {
             this.toolbar.selectedTool.end(this.drawingLayer);
-            //save canvas content to File
-            this.saveToFile();
         }
     }
 
     private saveToFile() {
+        console.log('save');
+        
         const lines = this.drawingLayer
             .getChildren()
             .map((line) => {

@@ -3,12 +3,14 @@ import { Background, BackgroundPattern } from "./Background"
 
 export interface Settings {
     defaultCanvasHeight: number
+    saveInterval: number
 	pens: Pen[]
     background: Background
 }
 
 export const DEFAULT_SETTINGS: Settings = {
     defaultCanvasHeight: 400,
+    saveInterval: 15,
 	pens: [
         new Pen('title', '#3739c8', 10, 0.5, false),
         new Pen('text', '#f61009', 3, 0.5, false),
