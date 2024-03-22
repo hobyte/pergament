@@ -36,6 +36,21 @@ export class SettingsTab extends PluginSettingTab {
 					}
 				})
 			})
+			new Setting(generalContainer)
+			.setName('Save Interval')
+			.setDesc('Choose the Interval in second at witch the Canvas will saved.')
+			.addText(textArea => {
+				textArea.setValue(String(this.plugin.settings.saveInterval))
+				textArea.onChange(value => {
+					if (!isNaN(Number(value))) {
+						const size = Number(value)
+						this.plugin.settings.saveInterval = size > 0 ? size : 1;
+						this.plugin.saveSettings().then(() => console.log('saved settings'))
+					} else {
+						textArea.setValue(String(this.plugin.settings.saveInterval))
+					}
+				})
+			})
 
 		//Background
 		const backgroundContainer = containerEl.createEl('div');
