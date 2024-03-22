@@ -70,20 +70,37 @@ export class Canvas {
 
     private resizeStage(): void {
         const parentWitdh = this.parent.getBoundingClientRect().width;
+        const contentWidth = this.getContentWidth();
         if (!parentWitdh) {
             return
         }
-        if (parentWitdh <= 400) {
+
+        if (parentWitdh > contentWidth) {
             this.stage.size({
                 width: parentWitdh,
                 height: 400
             })
         } else {
             this.stage.size({
-                width: parentWitdh,
+                width: contentWidth,
                 height: 400
             })
         }
+    }
+
+    private getContentWidth(): number {
+        let width = 0
+        const children = this.drawingLayer.getChildren();
+
+        children.forEach((child: Line) => {
+            const clientRect = child.getClientRect();
+            const rightEdge = clientRect.x + clientRect.width;
+
+            if (rightEdge > width) {
+                width = rightEdge;
+            }
+        });
+        return width;
     }
 
     private drawBackground(): void {
@@ -116,7 +133,7 @@ export class Canvas {
         }
     }
 
-    private startTool(event: KonvaEventObject<any>) { 
+    private startTool(event: KonvaEventObject<any>) {
         if (this.editable) {
             this.toolbar.selectedTool.start(this.drawingLayer);
         }
