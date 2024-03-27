@@ -32,12 +32,19 @@ export class Toolbar {
     this._selectedTool = tool;
   }
 
-  private ToolbarView({settings, toolbar}: {settings: Settings, toolbar: Toolbar}) {
+  private ToolbarView({ settings, toolbar }: { settings: Settings, toolbar: Toolbar }) {
     return (
       <div>
-        {settings.pens.map((pen) => {
-          return <button key={useId()} onClick={() => toolbar.selectedTool = pen}>{pen.name}</button>
-        })}
+        <div>
+          {settings.pens.map(pen => {
+            return <button key={useId()} onClick={() => toolbar.selectedTool = pen}>{pen.name}</button>
+          })}
+        </div>
+        <div>
+          {settings.tools.map(tool => {
+            return <button key={useId()} onClick={() => toolbar.selectedTool = tool}>{tool.name}</button>
+          })}
+        </div>
       </div>
     )
   }
