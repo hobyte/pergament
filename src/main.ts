@@ -4,9 +4,8 @@ import { StorageAdapter } from './StorageAdapter';
 import { DEFAULT_SETTINGS, Settings } from './settings/Settings';
 import { Canvas } from './ui/Canvas';
 import { Toolbar } from './ui/Toolbar';
-import { Background } from './settings/Background';
-import { Pen } from './tools/Pen';
 import { SettingsTab } from './ui/SettingsTab'
+import * as _ from 'lodash';
 
 export default class Pergament extends Plugin implements StorageAdapter {
 	public settings: Settings;
@@ -79,28 +78,9 @@ export default class Pergament extends Plugin implements StorageAdapter {
 	async loadSettings() {
 		const settingsData = await this.loadData();
 
-		if (settingsData !== null) {
-			let newSettings = {
-				defaultCanvasHeight: settingsData.defaultCanvasHeight,
-				saveInterval: settingsData.saveInterval,
-				pens: settingsData.pens.map((pen: any) => {
-					return new Pen(
-						pen._name, 
-						pen._color, 
-						pen._width, 
-						pen._tension, 
-						pen._removable
-					)
-				}),
-				background: new Background(
-					settingsData.background._pattern, 
-					settingsData.background._size, 
-					settingsData.background._color
-				)
-			};
-			this.settings = newSettings;
-		} else {
-			this.settings = DEFAULT_SETTINGS,
+		this.settings = _.merge(DEFAULT_SETTINGS, settingsData)
+
+		if (settingsData == null) {
 			this.saveSettings();
 		}
 	}
