@@ -2,11 +2,12 @@ import { Layer } from "konva/lib/Layer";
 import { Tool } from "./Tool";
 import { Line } from "konva/lib/shapes/Line";
 import { Shape } from "konva/lib/Shape";
+import { Group } from "konva/lib/Group";
 
 export class Stretch extends Tool {
     private movingLine: Line
+    private moveItems: Shape[]
     private moving: boolean
-    private firstPos: { x: number, y: number }
     private oldPos: { x: number, y: number }
     private toolName = 'stretch-tool'
 
@@ -24,11 +25,21 @@ export class Stretch extends Tool {
 
         if (pos) {
             this.moving = true;
-            this.firstPos = pos;
             this.oldPos = pos;
 
             layer.add(this.movingLine);
             this.movingLine.points([0, pos.y, layer.width(), pos.y]);
+
+            //add layer elemens below cursor to moveItems
+            this.moveItems = []
+            layer
+                .find((node: Shape) => {
+                    const dimension = node.getClientRect();
+                    return dimension.y + dimension.height >= pos.y
+                })
+                .filter(node => node.getType() == 'Shape')
+                .filter((node: Shape) => node.name() != this.toolName)
+                .forEach((node: Shape) => this.moveItems.push(node));
         }
     }
 
@@ -36,25 +47,17 @@ export class Stretch extends Tool {
         if (this.moving) {
             const pos = layer.getRelativePointerPosition();
             if (pos) {
-                this.movingLine.points([0, pos.y, layer.width(), pos.y])
-
-                //move vanvas content below line
                 const deltaY = pos.y - this.oldPos.y;
                 this.oldPos = pos;
 
-                layer
-                    .find((node: Shape) => {
-                        const dimension = node.getClientRect();
-                        return dimension.y + dimension.height >= pos.y
-                    })
-                    .filter((node: Shape) => node.name() != this.toolName)
-                    .forEach((node: Shape) => node.move({x: 0, y: deltaY}));
+                this.movingLine.move({x: 0, y: deltaY})
+                this.moveItems.forEach((item: Shape) => item.move({x: 0, y: deltaY}))
             }
         }
     }
 
     public end(layer: Layer): void {
         this.moving = false;
-        this.movingLine.remove();
+        this.movingLine.remove()
     }
 }
