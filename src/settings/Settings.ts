@@ -4,7 +4,8 @@ import { Tool } from "src/tools/Tool"
 import { Stretch } from "src/tools/Stretch"
 
 export interface Settings {
-    defaultCanvasHeight: number
+    minimalCanvasHeight: number
+    bottomPadding: number
     saveInterval: number
 	pens: Pen[]
     tools: Tool[]
@@ -12,7 +13,8 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-    defaultCanvasHeight: 400,
+    minimalCanvasHeight: 400,
+    bottomPadding: 50,
     saveInterval: 15,
 	pens: [
         new Pen('title', '#3739c8', 10, 0.5, false),
