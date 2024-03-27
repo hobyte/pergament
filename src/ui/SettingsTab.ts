@@ -36,7 +36,7 @@ export class SettingsTab extends PluginSettingTab {
 					}
 				})
 			})
-			new Setting(generalContainer)
+		new Setting(generalContainer)
 			.setName('Save Interval')
 			.setDesc('Choose the Interval in second at witch the Canvas will saved.')
 			.addText(textArea => {
@@ -100,10 +100,10 @@ export class SettingsTab extends PluginSettingTab {
 
 		//Pens
 		const penContainer = containerEl.createEl('div')
-		backgroundContainer.createEl('h1').innerText = 'Pens';
+		penContainer.createEl('h1').innerText = 'Pens';
 
 		this.plugin.settings.pens.forEach(pen => {
-			const penDetails = backgroundContainer.createEl('details')
+			const penDetails = penContainer.createEl('details')
 			penDetails.createEl('summary', { text: pen.name, cls: 'settings-header' })
 
 			new Setting(penDetails)
@@ -145,7 +145,7 @@ export class SettingsTab extends PluginSettingTab {
 				})
 			new Setting(penDetails)
 				.setName('Tension')
-				.setDesc(`Choose the Tesnion of ${pen.name}. Higher values will result in a more curvy line.`)
+				.setDesc(`Choose the Tension of ${pen.name}. Higher values will result in a more curvy line.`)
 				.addText(textArea => {
 					textArea.setValue(String(pen.width))
 					textArea.onChange(value => {
@@ -186,5 +186,30 @@ export class SettingsTab extends PluginSettingTab {
 			this.plugin.saveSettings().then(() => console.log('saved settings'))
 			this.display();
 		}
+
+		//Tools
+		const toolsContainer = containerEl.createEl('div')
+		toolsContainer.createEl('h1', { text: 'Tools' })
+
+		//eraser
+		const eraserContainer = toolsContainer.createEl('div')
+		const eraserName = this.plugin.settings.tools.eraser.name
+		eraserContainer.createEl('h3', { text: eraserName.charAt(0).toUpperCase() + eraserName.slice(1) })
+
+		new Setting(eraserContainer)
+			.setName('Radius')
+			.setDesc('Choose the size of the eraser')
+			.addText(textArea => {
+				textArea.setValue(String(this.plugin.settings.tools.eraser.radius))
+				textArea.onChange(value => {
+					if (!isNaN(Number(value))) {
+						const radius = Number(value)
+						this.plugin.settings.tools.eraser.radius = radius >= 0 ? radius : 1;
+						this.plugin.saveSettings().then(() => console.log('saved settings'))
+					} else {
+						textArea.setValue(String(this.plugin.settings.tools.eraser.radius))
+					}
+				})
+			})
 	}
 }

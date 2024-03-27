@@ -41,7 +41,7 @@ export class Toolbar {
           })}
         </div>
         <div>
-          {settings.tools.map(tool => {
+          {Object.entries(settings.tools).map(([key, tool]) => {
             return <button key={useId()} onClick={() => toolbar.selectedTool = tool}>{tool.name}</button>
           })}
         </div>

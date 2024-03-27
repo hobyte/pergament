@@ -2,13 +2,17 @@ import { Pen } from "src/tools/Pen"
 import { Background, BackgroundPattern } from "./Background"
 import { Tool } from "src/tools/Tool"
 import { Stretch } from "src/tools/Stretch"
+import { Eraser } from "src/tools/Eraser"
 
 export interface Settings {
     minimalCanvasHeight: number
     bottomPadding: number
     saveInterval: number
 	pens: Pen[]
-    tools: Tool[]
+    tools: {
+        stretch: Stretch,
+        eraser: Eraser
+    }
     background: Background
 }
 
@@ -21,8 +25,9 @@ export const DEFAULT_SETTINGS: Settings = {
         new Pen('text', '#f61009', 3, 0.5, false),
         new Pen('code', '#1be43e', 3, 1, false),
 	],
-    tools: [
-        new Stretch('stretch', false)
-    ],
+    tools: {
+        stretch: new Stretch('stretch', false),
+        eraser: new Eraser('eraser', 10, false)
+    },
     background: new Background(BackgroundPattern.grid, 20, '#808080')
 }
