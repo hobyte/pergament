@@ -1,11 +1,12 @@
 import { Layer } from "konva/lib/Layer";
-import { KonvaEventListener, KonvaEventObject } from "konva/lib/Node";
+import { KonvaEventObject } from "konva/lib/Node";
 import { Stage } from "konva/lib/Stage";
 import { Line } from "konva/lib/shapes/Line";
 import { StorageAdapter } from "src/StorageAdapter";
 import { BackgroundPattern } from "src/settings/Background";
 import { Settings } from "src/settings/Settings";
 import { Toolbar } from "./Toolbar";
+import { Stretch } from "src/tools/Stretch";
 
 export class Canvas {
     private id: string
@@ -57,14 +58,14 @@ export class Canvas {
         this.stage = new Stage({
             container: container,
             width: 400,
-            height: this.settings.defaultCanvasHeight
+            height: this.settings.minimalCanvasHeight
         })
     }
 
     private watchParentResize(): void {
         const observer = new ResizeObserver(entries => {
             entries.forEach(entry => {
-                this.resizeStage();
+                this.adjustDimensions();
                 this.drawBackground();
             });
         });
@@ -72,24 +73,32 @@ export class Canvas {
         observer.observe(this.parent);
     }
 
-    private resizeStage(): void {
-        const parentWitdh = this.parent.getBoundingClientRect().width;
+    private adjustDimensions(): void {
+        const parentWidth = this.parent.getBoundingClientRect().width;
         const contentWidth = this.getContentWidth();
-        if (!parentWitdh) {
+        
+        if (!parentWidth) {
             return
         }
+        const width = parentWidth > contentWidth ? parentWidth : contentWidth
 
-        if (parentWitdh > contentWidth) {
-            this.stage.size({
-                width: parentWitdh,
-                height: 400
-            })
-        } else {
-            this.stage.size({
-                width: contentWidth,
-                height: 400
-            })
-        }
+        const minimalHeight = this.settings.minimalCanvasHeight;
+        let contentHeight = 0
+        this.drawingLayer.getChildren().forEach(item => {
+            const dimension = item.getClientRect();
+            const lowerY = dimension.y + dimension.height;
+            if (lowerY > contentHeight) {
+                contentHeight = lowerY;
+            }
+        });
+        contentHeight = contentHeight + this.settings.bottomPadding
+
+        const height = contentHeight > minimalHeight ? contentHeight : minimalHeight;
+
+        this.stage.size({
+            width: width,
+            height: height
+        })
     }
 
     private getContentWidth(): number {
@@ -148,10 +157,11 @@ export class Canvas {
             this.toolbar.selectedTool.move(this.drawingLayer);
         }
     }
-
+    
     private endTool(event: KonvaEventObject<any>) {
         if (this.editable) {
             this.toolbar.selectedTool.end(this.drawingLayer);
+            this.adjustDimensions();
         }
     }
 

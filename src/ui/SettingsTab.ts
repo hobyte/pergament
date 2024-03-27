@@ -23,16 +23,16 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(generalContainer)
 			.setName('Canvas Height')
-			.setDesc('Choose the default height of the canvas.')
+			.setDesc('Choose the minimal height of the canvas.')
 			.addText(textArea => {
-				textArea.setValue(String(this.plugin.settings.defaultCanvasHeight))
+				textArea.setValue(String(this.plugin.settings.minimalCanvasHeight))
 				textArea.onChange(value => {
 					if (!isNaN(Number(value))) {
 						const size = Number(value)
-						this.plugin.settings.defaultCanvasHeight = size > 0 ? size : 1;
+						this.plugin.settings.minimalCanvasHeight = size > 0 ? size : 1;
 						this.plugin.saveSettings().then(() => console.log('saved settings'))
 					} else {
-						textArea.setValue(String(this.plugin.settings.defaultCanvasHeight))
+						textArea.setValue(String(this.plugin.settings.minimalCanvasHeight))
 					}
 				})
 			})
