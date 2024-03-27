@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
 
 export enum BackgroundPattern {
     blank,

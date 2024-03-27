@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2024 hobyte
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
 .pergament-canvas {
     background-color: var(--background-primary-alt);
     border: var(--border-width) solid var(--interactive-hover);

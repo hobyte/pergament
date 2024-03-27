@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import { MarkdownView, Plugin } from 'obsidian';
 import { EditorView, showPanel } from '@codemirror/view';
 import { StorageAdapter } from './StorageAdapter';

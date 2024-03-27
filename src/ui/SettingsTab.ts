@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import Pergament from '../main';
 import { BackgroundPattern } from 'src/settings/Background';

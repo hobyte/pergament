@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 hobyte
+
+SPDX-License-Identifier: EPL-2.0
+-->
+
 # PERGAMENT
 
 Pergament is a handwriting and drawing Plugin for Obsidian
