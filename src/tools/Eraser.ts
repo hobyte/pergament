@@ -7,13 +7,21 @@ import { Circle } from "konva/lib/shapes/Circle";
 
 export class Eraser extends Tool {
     private isErasing: boolean
-    private radius: number
+    private _radius: number;
     private eraserCircle: Circle
 
     constructor(name: string, radius: number, removable: boolean) {
         super(name, removable);
 
-        this.radius = radius;
+        this._radius = radius;
+    }
+
+    public get radius(): number {
+        return this._radius;
+    }
+    
+    public set radius(value: number) {
+        this._radius = value;
     }
 
     public start(layer: Layer): void {
@@ -28,7 +36,7 @@ export class Eraser extends Tool {
             stroke: '#A835DB',
             x: pos.x,
             y: pos.y,
-            radius: this.radius
+            radius: this._radius
         })
         layer.add(this.eraserCircle);
     }
@@ -53,10 +61,10 @@ export class Eraser extends Tool {
         if (!pos) return;
 
         const box = {
-            x: pos.x - this.radius,
-            y: pos.y - this.radius,
-            width: this.radius * 2,
-            height: this.radius * 2
+            x: pos.x - this._radius,
+            y: pos.y - this._radius,
+            width: this._radius * 2,
+            height: this._radius * 2
         }
 
         layer
@@ -78,7 +86,7 @@ export class Eraser extends Tool {
                     .map((point: {x: number; y: number}) => {
                         //check if point of line is in radius
                         const distance = Math.sqrt(Math.pow(point.x - pos.x, 2) + Math.pow(point.y - pos.y, 2))
-                        if (distance < this.radius) {
+                        if (distance < this._radius) {
                             return true
                         }
                         return false

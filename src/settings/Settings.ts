@@ -9,7 +9,10 @@ export interface Settings {
     bottomPadding: number
     saveInterval: number
 	pens: Pen[]
-    tools: Tool[]
+    tools: {
+        stretch: Stretch,
+        eraser: Eraser
+    }
     background: Background
 }
 
@@ -22,9 +25,9 @@ export const DEFAULT_SETTINGS: Settings = {
         new Pen('text', '#f61009', 3, 0.5, false),
         new Pen('code', '#1be43e', 3, 1, false),
 	],
-    tools: [
-        new Stretch('stretch', false),
-        new Eraser('eraser', 10, false)
-    ],
+    tools: {
+        stretch: new Stretch('stretch', false),
+        eraser: new Eraser('eraser', 10, false)
+    },
     background: new Background(BackgroundPattern.grid, 20, '#808080')
 }
