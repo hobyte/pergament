@@ -6,7 +6,7 @@ import { StorageAdapter } from "src/StorageAdapter";
 import { BackgroundPattern } from "src/settings/Background";
 import { Settings } from "src/settings/Settings";
 import { Toolbar } from "./Toolbar";
-import { Stretch } from "src/tools/Stretch";
+import { timeStamp } from "console";
 
 export class Canvas {
     private id: string
@@ -18,6 +18,7 @@ export class Canvas {
     private stage: Stage
     private backgroundLayer: Layer
     private drawingLayer: Layer
+    private drawing = false
 
     constructor(parent: HTMLElement, settings: Settings, storage: StorageAdapter, toolbar: Toolbar, source: string, editable: boolean) {
         this.editable = editable;
@@ -46,8 +47,8 @@ export class Canvas {
         this.loadFromString(source)
 
         //set Interval for saving
-        const interval = this.settings.saveInterval*1000;
-        setInterval(() => this.saveToFile(), interval)
+        const interval = this.settings.saveInterval * 1000;
+        setInterval(() => this.checkReadyToSafe(), interval)
     }
 
     private createStage(parent: HTMLElement): void {
@@ -76,7 +77,7 @@ export class Canvas {
     private adjustDimensions(): void {
         const parentWidth = this.parent.getBoundingClientRect().width;
         const contentWidth = this.getContentWidth();
-        
+
         if (!parentWidth) {
             return
         }
@@ -147,6 +148,7 @@ export class Canvas {
     }
 
     private startTool(event: KonvaEventObject<any>) {
+        this.drawing = true
         if (this.editable) {
             this.toolbar.selectedTool.start(this.drawingLayer);
         }
@@ -157,17 +159,34 @@ export class Canvas {
             this.toolbar.selectedTool.move(this.drawingLayer);
         }
     }
-    
+
     private endTool(event: KonvaEventObject<any>) {
+        this.drawing = false
         if (this.editable) {
             this.toolbar.selectedTool.end(this.drawingLayer);
             this.adjustDimensions();
         }
     }
 
-    private saveToFile() {
+    private checkReadyToSafe() {
+        if (!this.drawing) {
+            this.save();
+        } else {
+            const delay = 1000;
+            const pollingInterval = setInterval(() => {
+                if (!this.drawing) {
+                    console.log('check save');
+                    
+                    this.save();
+                    clearInterval(pollingInterval);
+                }
+            }, delay)
+        }
+    }
+
+    private save() {
         console.log('save');
-        
+
         const lines = this.drawingLayer
             .getChildren()
             .map((line) => {
