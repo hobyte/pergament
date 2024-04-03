@@ -1,8 +1,9 @@
-import { Settings } from "src/settings/Settings"
+import { ICONMAPPING, Settings } from "src/settings/Settings"
 import { Toolbar } from "./Toolbar"
 import { Pen } from "src/tools/Pen"
-import { useId } from "react"
+import { useEffect, useId, useRef } from "react"
 import { Tool } from "src/tools/Tool"
+import { setIcon } from "obsidian"
 
 export function ToolbarView({ settings, toolbar }: { settings: Settings, toolbar: Toolbar }) {
     return (
@@ -24,7 +25,7 @@ export function PenSelector({ pens, toolbar }: { pens: Pen[], toolbar: Toolbar }
     return (
         <div>
             {pens.map(pen => {
-                return <button key={useId()} onClick={() => toolbar.selectedTool = pen} className="pergament-toolbar-selectors"><PenIcon pen={pen}/></button>
+                return <button key={useId()} onClick={() => toolbar.selectedTool = pen} className="pergament-toolbar-selectors"><PenIcon pen={pen} /></button>
             })}
         </div>
     )
@@ -42,8 +43,31 @@ export function ToolSelector({ tools, toolbar }: { tools: Record<string, Tool>, 
     return (
         <div>
             {Object.entries(tools).map(([key, tool]) => {
-                return <button key={useId()} onClick={() => toolbar.selectedTool = tool} className="pergament-toolbar-selectors">{tool.name}</button>
+                return <ToolSelect
+                    key={useId()}
+                    tool={tool}
+                    toolbar={toolbar}
+                />
             })}
         </div>
+    )
+}
+
+export function ToolSelect({ tool, toolbar }: { tool: Tool, toolbar: Toolbar }) {
+    const toolRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (toolRef.current instanceof HTMLElement) {
+            setIcon(toolRef.current, ICONMAPPING[tool.name])
+        }
+    })
+
+    return (
+        <button
+            ref={toolRef}
+            onClick={() => toolbar.selectedTool = tool}
+            className="pergament-toolbar-selectors"
+        >
+        </button>
     )
 }

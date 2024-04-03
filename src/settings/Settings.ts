@@ -8,7 +8,7 @@ export interface Settings {
     minimalCanvasHeight: number
     bottomPadding: number
     saveInterval: number
-	pens: Pen[]
+    pens: Pen[]
     tools: {
         stretch: Stretch,
         eraser: Eraser
@@ -20,14 +20,23 @@ export const DEFAULT_SETTINGS: Settings = {
     minimalCanvasHeight: 400,
     bottomPadding: 50,
     saveInterval: 15,
-	pens: [
+    pens: [
         new Pen('title', '#3739c8', 10, 0.5, false),
         new Pen('text', '#f61009', 3, 0.5, false),
         new Pen('code', '#1be43e', 3, 1, false),
-	],
+    ],
     tools: {
         stretch: new Stretch('stretch', false),
         eraser: new Eraser('eraser', 10, false)
     },
     background: new Background(BackgroundPattern.grid, 20, '#808080')
+}
+
+interface IconMapping {
+    [key: string]: any
+}
+
+export const ICONMAPPING: IconMapping = {
+    stretch: 'unfold-vertical',
+    eraser: 'eraser'
 }
