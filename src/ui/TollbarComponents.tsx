@@ -24,9 +24,17 @@ export function PenSelector({ pens, toolbar }: { pens: Pen[], toolbar: Toolbar }
     return (
         <div>
             {pens.map(pen => {
-                return <button key={useId()} onClick={() => toolbar.selectedTool = pen} className="pergament-toolbar-selectors">{pen.name}</button>
+                return <button key={useId()} onClick={() => toolbar.selectedTool = pen} className="pergament-toolbar-selectors"><PenIcon pen={pen}/></button>
             })}
         </div>
+    )
+}
+
+export function PenIcon({ pen }: { pen: Pen }) {
+    return (
+        <svg height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+            <circle r={pen.width} cx="10" cy="10" fill={pen.color} />
+        </svg>
     )
 }
 
