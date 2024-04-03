@@ -59,5 +59,19 @@ export class Stretch extends Tool {
     public end(layer: Layer): void {
         this.moving = false;
         this.movingLine.remove()
+
+        //set points to absolute position and position to 0
+        this.moveItems.forEach((item: Line) => {
+            const deltaY = item.getAbsolutePosition().y
+            
+            item.position({x: 0, y: 0});
+            item.points(item.points().map((point, index: number) => {
+                if (index % 2 != 0) {
+                    return point + deltaY;
+                } else {
+                    return point;
+                }
+            }))
+        })
     }
 }
