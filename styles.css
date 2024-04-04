@@ -34,6 +34,10 @@
     margin: 3px;
 }
 
+.pergament-toolbar-selectors.selected {
+    background-color: var(--background-modifier-border-focus);
+}
+
 .vertical-divider {
     border-left: 3px solid var(--interactive-hover);
     height: 100%;
