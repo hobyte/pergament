@@ -6,7 +6,6 @@ import { StorageAdapter } from "src/StorageAdapter";
 import { BackgroundPattern } from "src/settings/Background";
 import { Settings } from "src/settings/Settings";
 import { Toolbar } from "./Toolbar";
-import { timeStamp } from "console";
 
 export class Canvas {
     private id: string

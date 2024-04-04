@@ -2,6 +2,7 @@ import { Tool } from "../tools/Tool";
 import { createRoot } from 'react-dom/client';
 import { StrictMode, useId } from "react";
 import { Settings } from "src/settings/Settings";
+import { ToolbarView } from "./TollbarComponents";
 
 export class Toolbar {
   private _selectedTool: Tool;
@@ -16,36 +17,19 @@ export class Toolbar {
     return this._selectedTool;
   }
 
+  public set selectedTool(value: Tool) {
+    this._selectedTool = value;
+  }
+
   public mount(parent: HTMLElement) {
     const root = createRoot(parent);
     root.render(
       <StrictMode>
-        <this.ToolbarView
+        <ToolbarView
           settings={this.settings}
           toolbar={this}
         />
       </StrictMode>
-    )
-  }
-
-  private set selectedTool(tool: Tool) {
-    this._selectedTool = tool;
-  }
-
-  private ToolbarView({ settings, toolbar }: { settings: Settings, toolbar: Toolbar }) {
-    return (
-      <div>
-        <div>
-          {settings.pens.map(pen => {
-            return <button key={useId()} onClick={() => toolbar.selectedTool = pen}>{pen.name}</button>
-          })}
-        </div>
-        <div>
-          {Object.entries(settings.tools).map(([key, tool]) => {
-            return <button key={useId()} onClick={() => toolbar.selectedTool = tool}>{tool.name}</button>
-          })}
-        </div>
-      </div>
     )
   }
 }
