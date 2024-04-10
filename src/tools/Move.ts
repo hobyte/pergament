@@ -1,9 +1,16 @@
 import { Layer } from "konva/lib/Layer";
 import { Tool } from "./Tool";
 import { createActor, createMachine } from "xstate";
-import { timeStamp } from "console";
+import { Shape } from "konva/lib/Shape";
+import { Line } from "konva/lib/shapes/Line";
+import { Rect } from "konva/lib/shapes/Rect";
+import { Vector2d } from "konva/lib/types";
 
 export class Move extends Tool {
+    private selectionBorder: Shape;
+    private drawingLayer: Layer
+    private pointerOffset: Vector2d
+
     private stateMachine = createMachine({
         initial: 'start',
         states: {
@@ -22,51 +29,50 @@ export class Move extends Tool {
                         actions: () => this.moveSelection()
                     },
                     end: {
-                            target: 'markedSelection',
-                            actions: () => this.endSelection()
-                        },
+                        target: 'markedSelection',
+                        actions: () => this.endSelection()
+                    },
                     resetTool: {
-                            target: 'start',
-                            actions: () => this.resetTool()
-                        },
+                        target: 'start',
+                        actions: () => this.resetTool()
+                    },
                 }
             },
             markedSelection: {
                 on: {
                     start: {
-                            target: 'moveSelection',
-                            actions: () => this.startMove()
-                        },
+                        target: 'moveSelection',
+                        actions: () => this.startMove()
+                    },
                     reset: {
-                            target: 'start',
-                            actions: () => this.reset()
-                        },
+                        target: 'start',
+                        actions: () => this.reset()
+                    },
                     resetTool: {
-                            target: 'start',
-                            actions: () => this.resetTool()
-                        },
+                        target: 'start',
+                        actions: () => this.resetTool()
+                    },
                 }
             },
             moveSelection: {
                 on: {
                     move: {
-                            target: 'moveSelection',
-                            actions: () => this.moveMove()
-                        },
+                        target: 'moveSelection',
+                        actions: () => this.moveMove()
+                    },
                     end: {
-                            target: 'markedSelection',
-                            actions: () => this.endMove()
-                        },
+                        target: 'markedSelection',
+                    },
                     resetTool: {
-                            target: 'start',
-                            actions: () => this.resetTool()
-                        },
+                        target: 'start',
+                        actions: () => this.resetTool()
+                    },
                 }
             },
         }
     })
     private stateActor = createActor(this.stateMachine)
-    
+
     constructor(name: string, removable: boolean) {
         super(name, removable);
 
@@ -74,43 +80,103 @@ export class Move extends Tool {
     }
 
     public start(layer: Layer): void {
-        this.stateActor.send({type: 'start'})
+        this.drawingLayer = layer;
+        if (this.selectionBorder instanceof Rect) {
+            const boundingBox = (this.selectionBorder as Rect).getClientRect()
+            const pos = this.drawingLayer.getRelativePointerPosition();
+            if (!pos) {
+                console.error('positon  not found')
+                return
+            }
+            if (
+                pos.x < boundingBox.x ||
+                pos.x > boundingBox.x + boundingBox.width ||
+                pos.y < boundingBox.y ||
+                pos.y > boundingBox.y + boundingBox.height
+            ) {
+                this.stateActor.send({ type: 'reset' })
+                return
+            }
+        }
+        this.stateActor.send({ type: 'start' })
     }
 
     public move(layer: Layer): void {
-        this.stateActor.send({type: 'move'})
+        this.drawingLayer = layer;
+        this.stateActor.send({ type: 'move' })
     }
 
     public end(layer: Layer): void {
-        this.stateActor.send({type: 'end'})
+        this.drawingLayer = layer;
+        this.stateActor.send({ type: 'end' })
     }
 
     private startSelection() {
-        console.log('start selection')
+        const pos = this.drawingLayer.getRelativePointerPosition();
+        if (!pos) {
+            console.error('positon  not found')
+            return
+        }
+        this.selectionBorder = new Line({
+            name: 'selectionBorder',
+            closed: true,
+            strokeWidth: 3,
+            stroke: '#A835DB',
+            points: [pos.x, pos.y]
+        })
+        this.drawingLayer.add(this.selectionBorder)
     }
 
     private moveSelection() {
-        console.log('move selection')
+        const pos = this.drawingLayer.getRelativePointerPosition();
+        if (!pos) {
+            console.error('positon  not found')
+            return
+        }
+        const selectionLine = this.selectionBorder as Line
+        selectionLine.points(selectionLine.points().concat([pos.x, pos.y]))
     }
 
     private endSelection() {
-        console.log('end selection')
+        const selectionLine = this.selectionBorder as Line
+        const boundingBox = selectionLine.getClientRect()
+        selectionLine.remove()
+        this.selectionBorder = new Rect({
+            name: 'selectionBorder',
+            x: boundingBox.x,
+            y: boundingBox.y,
+            width: boundingBox.width,
+            height: boundingBox.height,
+            strokeWidth: 3,
+            stroke: '#A835DB',
+        })
+        this.drawingLayer.add(this.selectionBorder)
     }
 
     private startMove() {
-        console.log('start move')
+        const pos = this.drawingLayer.getRelativePointerPosition();
+        if (!pos) {
+            console.error('positon  not found')
+            return
+        }
+        const selectionRect = this.selectionBorder as Rect
+        const rectPos = selectionRect.position()
+        this.pointerOffset = { x: pos.x - rectPos.x, y: pos.y - rectPos.y }
     }
 
     private moveMove() {
-        console.log('move move')
-    }
-
-    private endMove() {
-        console.log('end move')
+        const selectionRect = this.selectionBorder as Rect;
+        const pos = this.drawingLayer.getRelativePointerPosition();
+        if (!pos) {
+            console.error('positon  not found')
+            return
+        }
+        selectionRect.position({ x: pos.x - this.pointerOffset.x, y: pos.y - this.pointerOffset.y })
     }
 
     private reset() {
         console.log('reset')
+        this.selectionBorder.destroy()
     }
 
     private resetTool() {
