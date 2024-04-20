@@ -4,7 +4,6 @@ import { createActor, createMachine } from "xstate";
 import { Shape } from "konva/lib/Shape";
 import { Line } from "konva/lib/shapes/Line";
 import { Rect } from "konva/lib/shapes/Rect";
-import { Vector2d } from "konva/lib/types";
 import * as _ from "lodash";
 
 var classifyPoint = require("robust-point-in-polygon")
@@ -13,7 +12,7 @@ export class Move extends Tool {
     private selectionBorder: Shape;
     private selectedElements: Shape[] = []
     private drawingLayer: Layer
-    private pointerOffset: Vector2d
+    private oldPointerPosition: { x: number; y: number; }
 
     private stateMachine = createMachine({
         initial: 'start',
@@ -222,9 +221,7 @@ export class Move extends Tool {
             console.error('positon  not found')
             return
         }
-        const selectionRect = this.selectionBorder as Rect
-        const rectPos = selectionRect.position()
-        this.pointerOffset = { x: pos.x - rectPos.x, y: pos.y - rectPos.y }
+        this.oldPointerPosition = pos
     }
 
     private moveMove() {
@@ -234,7 +231,21 @@ export class Move extends Tool {
             console.error('positon  not found')
             return
         }
-        selectionRect.position({ x: pos.x - this.pointerOffset.x, y: pos.y - this.pointerOffset.y })
+
+        const deltaX = pos.x - this.oldPointerPosition.x
+        const deltaY = pos.y - this.oldPointerPosition.y
+        this.oldPointerPosition = pos
+
+        selectionRect.position({ x: selectionRect.position().x + deltaX, y: selectionRect.position().y + deltaY})
+        this.selectedElements.forEach((line: Line) => {
+            line.points(line.points().map((point: number, index: number) => {
+                if (index % 2 === 0) {
+                    return point + deltaX
+                } else {
+                    return point + deltaY
+                }
+            }))
+        })
     }
 
     private resetStates() {
