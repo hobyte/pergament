@@ -32,9 +32,9 @@ export class Move extends Tool {
                         target: 'markedSelection',
                         actions: () => this.endSelection()
                     },
-                    resetTool: {
+                    reset: {
                         target: 'start',
-                        actions: () => this.resetTool()
+                        actions: () => this.resetStates()
                     },
                 }
             },
@@ -48,16 +48,12 @@ export class Move extends Tool {
                         },
                         {
                             target:'start',
-                            actions: () => this.reset()
+                            actions: () => this.resetStates()
                         }
                     ],
                     reset: {
                         target: 'start',
-                        actions: () => this.reset()
-                    },
-                    resetTool: {
-                        target: 'start',
-                        actions: () => this.resetTool()
+                        actions: () => this.resetStates()
                     },
                 }
             },
@@ -70,9 +66,9 @@ export class Move extends Tool {
                     end: {
                         target: 'markedSelection',
                     },
-                    resetTool: {
+                    reset: {
                         target: 'start',
-                        actions: () => this.resetTool()
+                        actions: () => this.resetStates()
                     },
                 }
             },
@@ -100,6 +96,10 @@ export class Move extends Tool {
     public end(layer: Layer): void {
         this.drawingLayer = layer;
         this.stateActor.send({ type: 'end' })
+    }
+
+    public reset(): void {
+        this.stateActor.send({ type:'reset' })
     }
 
     private isInsideSelection() {
@@ -184,11 +184,7 @@ export class Move extends Tool {
         selectionRect.position({ x: pos.x - this.pointerOffset.x, y: pos.y - this.pointerOffset.y })
     }
 
-    private reset() {
+    private resetStates() {
         this.selectionBorder.destroy()
-    }
-
-    private resetTool() {
-        console.log('reset tool')
     }
 }
