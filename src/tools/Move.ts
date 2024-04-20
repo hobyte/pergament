@@ -40,10 +40,17 @@ export class Move extends Tool {
             },
             markedSelection: {
                 on: {
-                    start: {
-                        target: 'moveSelection',
-                        actions: () => this.startMove()
-                    },
+                    start: [
+                        {
+                            target: 'moveSelection',
+                            guard: () => this.isInsideSelection(),
+                            actions: () => this.startMove()
+                        },
+                        {
+                            target:'start',
+                            actions: () => this.reset()
+                        }
+                    ],
                     reset: {
                         target: 'start',
                         actions: () => this.reset()
@@ -77,27 +84,11 @@ export class Move extends Tool {
         super(name, removable);
 
         this.stateActor.start()
+        this.stateActor.subscribe(snapshot => console.log(snapshot.value))
     }
 
     public start(layer: Layer): void {
         this.drawingLayer = layer;
-        if (this.selectionBorder instanceof Rect) {
-            const boundingBox = (this.selectionBorder as Rect).getClientRect()
-            const pos = this.drawingLayer.getRelativePointerPosition();
-            if (!pos) {
-                console.error('positon  not found')
-                return
-            }
-            if (
-                pos.x < boundingBox.x ||
-                pos.x > boundingBox.x + boundingBox.width ||
-                pos.y < boundingBox.y ||
-                pos.y > boundingBox.y + boundingBox.height
-            ) {
-                this.stateActor.send({ type: 'reset' })
-                return
-            }
-        }
         this.stateActor.send({ type: 'start' })
     }
 
@@ -109,6 +100,25 @@ export class Move extends Tool {
     public end(layer: Layer): void {
         this.drawingLayer = layer;
         this.stateActor.send({ type: 'end' })
+    }
+
+    private isInsideSelection() {
+        const boundingBox = (this.selectionBorder as Rect).getClientRect()
+        const pos = this.drawingLayer.getRelativePointerPosition();
+        if (!pos) {
+            console.error('positon  not found')
+            return false
+        }
+        //pointer outside of selection box
+        if (
+            pos.x < boundingBox.x ||
+            pos.x > boundingBox.x + boundingBox.width ||
+            pos.y < boundingBox.y ||
+            pos.y > boundingBox.y + boundingBox.height
+        ) {
+            return false
+        }
+        return true
     }
 
     private startSelection() {
@@ -175,7 +185,6 @@ export class Move extends Tool {
     }
 
     private reset() {
-        console.log('reset')
         this.selectionBorder.destroy()
     }
 
