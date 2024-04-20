@@ -4,6 +4,7 @@ import { Pen } from "src/tools/Pen"
 import { useEffect, useId, useRef, useState } from "react"
 import { Tool } from "src/tools/Tool"
 import { setIcon } from "obsidian"
+import { Move } from "src/tools/Move"
 
 export function ToolbarView({ settings, toolbar }: { settings: Settings, toolbar: Toolbar }) {
     const [update, setUpdate] = useState('null')
@@ -35,6 +36,9 @@ export function PenSelector(
                 return <button
                     key={useId()}
                     onClick={() => {
+                        if (toolbar.selectedTool instanceof Move) {
+                            toolbar.selectedTool.reset()
+                        }
                         toolbar.selectedTool = pen;
                         setUpdate(pen.name)
                     }}
