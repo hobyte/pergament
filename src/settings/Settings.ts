@@ -7,6 +7,7 @@ import { Background, BackgroundPattern } from "./Background"
 import { Tool } from "src/tools/Tool"
 import { Stretch } from "src/tools/Stretch"
 import { Eraser } from "src/tools/Eraser"
+import { Move } from "src/tools/Move"
 
 export interface Settings {
     minimalCanvasHeight: number
@@ -15,7 +16,8 @@ export interface Settings {
     pens: Pen[]
     tools: {
         stretch: Stretch,
-        eraser: Eraser
+        eraser: Eraser,
+        move: Move,
     }
     background: Background
 }
@@ -31,7 +33,8 @@ export const DEFAULT_SETTINGS: Settings = {
     ],
     tools: {
         stretch: new Stretch('stretch', false),
-        eraser: new Eraser('eraser', 10, false)
+        eraser: new Eraser('eraser', 10, false),
+        move: new Move('move', false),
     },
     background: new Background(BackgroundPattern.grid, 20, '#808080')
 }
@@ -42,5 +45,6 @@ interface IconMapping {
 
 export const ICONMAPPING: IconMapping = {
     stretch: 'unfold-vertical',
-    eraser: 'eraser'
+    eraser: 'eraser',
+    move: 'move',
 }
