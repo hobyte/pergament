@@ -5,9 +5,13 @@ import { Shape } from "konva/lib/Shape";
 import { Line } from "konva/lib/shapes/Line";
 import { Rect } from "konva/lib/shapes/Rect";
 import { Vector2d } from "konva/lib/types";
+import * as _ from "lodash";
+
+var classifyPoint = require("robust-point-in-polygon")
 
 export class Move extends Tool {
     private selectionBorder: Shape;
+    private selectedElements: Shape[] = []
     private drawingLayer: Layer
     private pointerOffset: Vector2d
 
@@ -47,7 +51,7 @@ export class Move extends Tool {
                             actions: () => this.startMove()
                         },
                         {
-                            target:'start',
+                            target: 'start',
                             actions: () => this.resetStates()
                         }
                     ],
@@ -80,7 +84,6 @@ export class Move extends Tool {
         super(name, removable);
 
         this.stateActor.start()
-        this.stateActor.subscribe(snapshot => console.log(snapshot.value))
     }
 
     public start(layer: Layer): void {
@@ -99,7 +102,7 @@ export class Move extends Tool {
     }
 
     public reset(): void {
-        this.stateActor.send({ type:'reset' })
+        this.stateActor.send({ type: 'reset' })
     }
 
     private isInsideSelection() {
@@ -149,14 +152,64 @@ export class Move extends Tool {
 
     private endSelection() {
         const selectionLine = this.selectionBorder as Line
-        const boundingBox = selectionLine.getClientRect()
-        selectionLine.remove()
+        const selectionPolygon = _.chunk(selectionLine.points(), 2)
+        selectionLine.destroy()
+
+        this.drawingLayer
+            .find((element: Shape) => element instanceof Line)
+            .forEach((line: Line) => {
+                _.chunk(line.points(), 2)
+                    .some((point: Array<number>) => {
+                        if (classifyPoint(selectionPolygon, point) <= 0) {
+                            console.log('line in selection')
+                            this.selectedElements.push(line)
+
+                            line.shadowEnabled(true)
+                            line.shadowColor('#FFFFFF')
+                            line.shadowBlur(10)
+                            line.shadowOpacity(0.5)
+
+                            //end loop
+                            return true
+                        }
+                    })
+            })
+
+        let box = {
+            x: Infinity,
+            y: Infinity,
+            width: 0,
+            height: 0
+        }
+
+        this.selectedElements
+            .map((element: Shape) => element.getClientRect())
+            .forEach((rect: {
+                width: number;
+                height: number;
+                x: number;
+                y: number;
+            }) => {
+                if (rect.x < box.x) {
+                    box.x = rect.x
+                }
+                if (rect.y < box.y) {
+                    box.y = rect.y
+                }
+                if (rect.x + rect.width > box.width) {
+                    box.width = rect.x + rect.width - box.x
+                }
+                if (rect.y + rect.height > box.height) {
+                    box.height = rect.y + rect.height - box.y
+                }
+            })
+
         this.selectionBorder = new Rect({
             name: 'selectionBorder',
-            x: boundingBox.x,
-            y: boundingBox.y,
-            width: boundingBox.width,
-            height: boundingBox.height,
+            x: box.x,
+            y: box.y,
+            width: box.width,
+            height: box.height,
             strokeWidth: 3,
             stroke: '#A835DB',
         })
@@ -186,5 +239,10 @@ export class Move extends Tool {
 
     private resetStates() {
         this.selectionBorder.destroy()
+
+        this.selectedElements.forEach(element => {
+            element.shadowEnabled(false)
+        })
+        this.selectedElements = []
     }
 }
