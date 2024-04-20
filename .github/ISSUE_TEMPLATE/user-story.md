@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 hobyte
+
+SPDX-License-Identifier: EPL-2.0
+-->
+
 ---
 name: User story
 about: Template for creating a user story

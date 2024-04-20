@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import { Tool } from "../tools/Tool";
 import { createRoot } from 'react-dom/client';
 import { StrictMode, useId } from "react";

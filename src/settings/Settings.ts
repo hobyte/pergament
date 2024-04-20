@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import { Pen } from "src/tools/Pen"
 import { Background, BackgroundPattern } from "./Background"
 import { Tool } from "src/tools/Tool"

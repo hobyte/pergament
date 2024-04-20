@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import { Layer } from "konva/lib/Layer";
 import { Tool } from "./Tool";
 import { Shape } from "konva/lib/Shape";
