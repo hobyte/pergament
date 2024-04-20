@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: EPL-2.0
 
-import { MarkdownView, Plugin } from 'obsidian';
+import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { EditorView, showPanel } from '@codemirror/view';
 import { StorageAdapter } from './StorageAdapter';
 import { DEFAULT_SETTINGS, Settings } from './settings/Settings';
@@ -42,13 +42,21 @@ export default class Pergament extends Plugin implements StorageAdapter {
 			
 			new Canvas(el, this.settings, this, this.toolbar, source, editable);
 		});
+
+		this.addCommand({
+			id: "pergament-create-Canvas",
+			name: 'create a new Pergament canvas',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				editor.replaceSelection('```pergament\n\n```');
+			}
+		})
 	}
 
 	public save(content: string, id: string): void {
 		const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (mdView?.getMode() === 'preview') return;
 
-		// @ts-ignore
+		// @ts-expect-error, not typed
 		const view = mdView?.editor.cm as EditorView;
 		const element = document.getElementById(id);
 		if (!element) {
