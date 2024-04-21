@@ -1,0 +1,19 @@
+# your pipeline stages
+stages:
+  - build
+  - test
+  - package-build
+  - package-test
+  - infra
+  - deploy
+  - acceptance
+  - publish
+  - infra-prod
+  - production
+
+build-plugin:
+  stage: build
+  image: node
+  script:
+    - npm install
+    - npm run build
