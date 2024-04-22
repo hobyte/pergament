@@ -41,6 +41,8 @@ code_quality:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
+  variables:
+    TIMEOUT_SECONDS: 3600
 
 #output code quality report as html and json
 code_quality_html:
