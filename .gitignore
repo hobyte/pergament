@@ -30,3 +30,7 @@ data.json
 
 # reuse
 .reuse
+
+# gitlab-ci-local
+/.gitlab-ci-local
+/reports

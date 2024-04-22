@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import { ICONMAPPING, Settings } from "src/settings/Settings"
 import { Toolbar } from "./Toolbar"
 import { Pen } from "src/tools/Pen"
