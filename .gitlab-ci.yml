@@ -8,6 +8,8 @@ include:
   - project: "to-be-continuous/renovate"
     ref: "1.2"
     file: "templates/gitlab-ci-renovate.yml"
+  #GitLab Static Application Security Testing
+  - template: Jobs/SAST.gitlab-ci.yml
 
 # secret variables
 # (define the variables below in your GitLab group/project variables)
