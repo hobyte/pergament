@@ -10,6 +10,10 @@ include:
     file: "templates/gitlab-ci-renovate.yml"
   #GitLab Static Application Security Testing
   - template: Jobs/SAST.gitlab-ci.yml
+  #Gitlab secret detection
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  #Gitlab code quality scanning
+  - template: Jobs/Code-Quality.gitlab-ci.yml
 
 # secret variables
 # (define the variables below in your GitLab group/project variables)
@@ -29,6 +33,24 @@ stages:
   - infra-prod
   - production
 
+#run code quality check on merge request pipelines
+code_quality:
+  rules:
+    - if: $CODE_QUALITY_DISABLED
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+#output code quality report as html and json
+code_quality_html:
+  extends: code_quality
+  variables:
+    REPORT_FORMAT: html
+  artifacts:
+    paths: [gl-code-quality-report.html]
+
+# build the plugin
 build-plugin:
   stage: build
   image: node
