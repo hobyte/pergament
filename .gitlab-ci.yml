@@ -1,5 +1,9 @@
 # included templates
 include:
+  # Node.js template
+  - project: "to-be-continuous/node"
+    ref: "3.12"
+    file: "templates/gitlab-ci-node.yml"
   # Gitleaks template
   - project: "to-be-continuous/gitleaks"
     ref: "2.5"
@@ -33,6 +37,10 @@ stages:
   - infra-prod
   - production
 
+# enable code lint
+variables:
+  NODE_LINT_ENABLED: "true"
+
 #run code quality check on merge request pipelines
 code_quality:
   rules:
@@ -51,17 +59,3 @@ code_quality_html:
     REPORT_FORMAT: html
   artifacts:
     paths: [gl-code-quality-report.html]
-
-# build the plugin
-build-plugin:
-  stage: build
-  image: node
-  script:
-    - npm install
-    - npm run build
-  artifacts:
-    paths:
-      - "main.js"
-      - "manifest.json"
-      - "style.css"
-    expire_in: "30 days"
