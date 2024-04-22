@@ -17,3 +17,9 @@ build-plugin:
   script:
     - npm install
     - npm run build
+  artifacts:
+    paths:
+      - "main.js"
+      - "manifest.json"
+      - "style.css"
+    expire_in: "30 days"
