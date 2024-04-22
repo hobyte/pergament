@@ -59,3 +59,11 @@ code_quality_html:
     REPORT_FORMAT: html
   artifacts:
     paths: [gl-code-quality-report.html]
+
+reuse:
+  stage: test
+  image:
+    name: fsfe/reuse:latest
+    entrypoint: [""]
+  script:
+    - reuse lint
