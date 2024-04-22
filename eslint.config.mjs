@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 hobyte
+//
+// SPDX-License-Identifier: EPL-2.0
+
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
