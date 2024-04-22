@@ -1,3 +1,19 @@
+# included templates
+include:
+  # Gitleaks template
+  - project: "to-be-continuous/gitleaks"
+    ref: "2.5"
+    file: "templates/gitlab-ci-gitleaks.yml"
+  # Renovate template
+  - project: "to-be-continuous/renovate"
+    ref: "1.2"
+    file: "templates/gitlab-ci-renovate.yml"
+
+# secret variables
+# (define the variables below in your GitLab group/project variables)
+# RENOVATE_TOKEN: A GitLab access token to allow Renovate crawl your projects. [See doc](https://docs.renovatebot.com/modules/platform/gitlab/#authentication)
+# GITHUB_COM_TOKEN: A GitHub access token to allow Renovate fetch changelogs. [See doc](https://docs.renovatebot.com/getting-started/running/#githubcom-token-for-changelogs)
+
 # your pipeline stages
 stages:
   - build
