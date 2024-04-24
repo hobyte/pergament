@@ -14,4 +14,4 @@ SPDX-License-Identifier: CC-BY-SA-2.0
 * Pergament version:
 * Operating System and version (desktop or mobile):
 
-/label question
+/label ~question

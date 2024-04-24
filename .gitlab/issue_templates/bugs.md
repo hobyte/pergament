@@ -39,4 +39,4 @@ Please search on the [issue tracker](../) before creating one.
 * Pergament version:
 * Operating System and version (desktop or mobile):
 
-/label bug
+/label ~bug
