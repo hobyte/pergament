@@ -26,4 +26,4 @@ implementation of this feature. -->
 <!-- Consider adding links to similar features in other Programms or any 
 information that will be usefull for this implementing this feature -->
 
-/label enhancement
+/label ~enhancement
