@@ -1,3 +1,10 @@
+<!--
+SPDX-FileCopyrightText: 2024 hobyte
+SPDX-FileCopyrightText: 2024 stevemao
+
+SPDX-License-Identifier: Unlicense
+-->
+
 Your issue may already be reported!
 Please search on the [issue tracker](../) before creating one.
 - [] This bug has not been reported

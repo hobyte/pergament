@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 hobyte
+
+SPDX-License-Identifier: CC-BY-SA-2.0
+-->
+
 ## What problem does this feature solve?
 <!-- Describe the problem the new feature would solve. -->
 
