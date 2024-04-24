@@ -7,7 +7,7 @@ SPDX-License-Identifier: Unlicense
 
 Your issue may already be reported!
 Please search on the [issue tracker](../) before creating one.
-- [] This bug has not been reported
+- [ ] This bug has not been reported
 
 ## Expected Behavior
 <!--- If you're describing a bug, tell us what should happen -->
@@ -38,3 +38,5 @@ Please search on the [issue tracker](../) before creating one.
 * Obsidian version:
 * Pergament version:
 * Operating System and version (desktop or mobile):
+
+/label bug
