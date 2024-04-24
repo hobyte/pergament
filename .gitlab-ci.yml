@@ -20,8 +20,6 @@ include:
   - template: Jobs/SAST.gitlab-ci.yml
   #Gitlab secret detection
   - template: Jobs/Secret-Detection.gitlab-ci.yml
-  #Gitlab code quality scanning
-  - template: Jobs/Code-Quality.gitlab-ci.yml
 
 # secret variables
 # (define the variables below in your GitLab group/project variables)
@@ -44,17 +42,6 @@ stages:
 # enable code lint
 variables:
   NODE_LINT_ENABLED: "true"
-
-#run code quality check on merge request pipelines
-code_quality:
-  rules:
-    - if: $CODE_QUALITY_DISABLED
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_TAG
-  variables:
-    TIMEOUT_SECONDS: 3600
 
 reuse:
   stage: test
