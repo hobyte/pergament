@@ -48,3 +48,4 @@ export const ICONMAPPING: IconMapping = {
     eraser: 'eraser',
     move: 'move',
 }
+export const USERCREATEDMARKER: string = "usercreated"

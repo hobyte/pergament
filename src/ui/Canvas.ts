@@ -8,7 +8,7 @@ import { Stage } from "konva/lib/Stage";
 import { Line } from "konva/lib/shapes/Line";
 import { StorageAdapter } from "src/StorageAdapter";
 import { BackgroundPattern } from "src/settings/Background";
-import { Settings } from "src/settings/Settings";
+import { Settings, USERCREATEDMARKER } from "src/settings/Settings";
 import { Toolbar } from "./Toolbar";
 
 export class Canvas {
@@ -190,9 +190,12 @@ export class Canvas {
     private save() {
         console.log('save');
 
+
+
         const lines = this.drawingLayer
-            .getChildren()
+            .find(`#${USERCREATEDMARKER}`)
             .map((line) => {
+                console.log(line.name())
                 let attr = line.attrs;
                 attr.name = line.name();
                 return attr;
