@@ -178,8 +178,6 @@ export class Canvas {
             const delay = 1000;
             const pollingInterval = setInterval(() => {
                 if (!this.drawing) {
-                    console.log('check save');
-                    
                     this.save();
                     clearInterval(pollingInterval);
                 }
@@ -189,9 +187,7 @@ export class Canvas {
 
     private save() {
         console.log('save');
-
-
-
+        
         const lines = this.drawingLayer
             .find(`#${USERCREATEDMARKER}`)
             .map((line) => {

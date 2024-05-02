@@ -10,7 +10,7 @@ import { Line } from "konva/lib/shapes/Line";
 import { Rect } from "konva/lib/shapes/Rect";
 import * as _ from "lodash";
 
-var classifyPoint = require("robust-point-in-polygon")
+var pointInPolygon = require("robust-point-in-polygon")
 
 export class Move extends Tool {
     private selectionBorder: Shape;
@@ -163,8 +163,7 @@ export class Move extends Tool {
             .forEach((line: Line) => {
                 _.chunk(line.points(), 2)
                     .some((point: Array<number>) => {
-                        if (classifyPoint(selectionPolygon, point) <= 0) {
-                            console.log('line in selection')
+                        if (pointInPolygon(selectionPolygon, point) <= 0) {
                             this.selectedElements.push(line)
 
                             line.shadowEnabled(true)
