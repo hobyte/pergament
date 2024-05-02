@@ -98,6 +98,9 @@ export default class Pergament extends Plugin implements StorageAdapter {
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings);
+		const settings = {...this.settings };
+		delete settings.tools.move
+		delete settings.tools.stretch
+		await this.saveData(settings);
 	}
 }
