@@ -5,6 +5,7 @@
 import { Tool } from "./Tool";
 import { Line } from "konva/lib/shapes/Line";
 import { Layer } from "konva/lib/Layer";
+import { USERCREATEDMARKER } from "src/settings/Settings";
 
 export class Pen extends Tool {
     private _color: string;
@@ -56,6 +57,7 @@ export class Pen extends Tool {
         this.drawing = true;
         this.currentLine = new Line({
             name: this.name,
+            id: USERCREATEDMARKER,
             stroke: this.color,
             strokeWidth: this.width,
             tension: this.tension,
